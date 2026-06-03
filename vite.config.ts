@@ -43,7 +43,7 @@ export default defineConfig(() => {
           theme_color: '#141414',
           orientation: 'any'
         },
-        injectRegister: 'auto',
+        injectRegister: 'inline',
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff,woff2}'],
           maximumFileSizeToCacheInBytes: 5000000
