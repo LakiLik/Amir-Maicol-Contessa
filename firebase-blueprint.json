@@ -1,0 +1,324 @@
+{
+  "entities": {
+    "animal": {
+      "title": "Animal",
+      "description": "Represents a livestock animal in the system.",
+      "type": "object",
+      "properties": {
+        "earTag": {
+          "type": "string",
+          "description": "The unique ear tag identifier."
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional name of the animal."
+        },
+        "species": {
+          "type": "string",
+          "description": "The species of the animal (e.g., cow, bull)."
+        },
+        "gender": {
+          "type": "string",
+          "description": "The gender of the animal."
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "description": "The date of birth in YYYY-MM-DD format."
+        },
+        "breed": {
+          "type": "string",
+          "description": "The breed of the animal."
+        },
+        "healthStatus": {
+          "type": "string",
+          "description": "The current health status of the animal."
+        },
+        "motherId": {
+          "type": "string",
+          "description": "The ID of the mother animal, if known."
+        },
+        "fatherId": {
+          "type": "string",
+          "description": "The ID of the father animal, if known."
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "URL to a photo of the animal."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who owns this animal record."
+        },
+        "currentWeight": {
+          "type": "number",
+          "description": "The most recent weight of the animal."
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Timestamp of creation."
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Timestamp of last update."
+        }
+      },
+      "required": ["earTag", "species", "dateOfBirth", "userId", "createdAt", "updatedAt"]
+    },
+    "treatment": {
+      "title": "Veterinary Treatment",
+      "description": "Represents a veterinary treatment or vaccination for an animal.",
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "Date of the treatment."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of treatment (e.g., vaccine, checkup)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the treatment."
+        },
+        "medicine": {
+          "type": "string",
+          "description": "Medicine administered, if any."
+        },
+        "nextDueDate": {
+          "type": "string",
+          "description": "Next due date for repeating treatments like vaccines (YYYY-MM-DD)."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user."
+        },
+        "createdAt": {
+          "type": "number"
+        }
+      },
+      "required": ["date", "type", "description", "userId", "createdAt"]
+    },
+    "weight_record": {
+      "title": "Weight Record",
+      "description": "Represents a single weight measurement.",
+      "type": "object",
+      "properties": {
+        "animalId": {
+          "type": "string",
+          "description": "Animal ID, present in root collection records."
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of measurement in YYYY-MM-DD."
+        },
+        "weight": {
+          "type": "number",
+          "description": "Weight recorded."
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number"
+        }
+      },
+      "required": ["date", "weight", "userId", "createdAt"]
+    },
+    "photo": {
+      "title": "Photo",
+      "description": "Represents a photo of an animal in the gallery.",
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number"
+        }
+      },
+      "required": ["url", "userId", "createdAt"]
+    },
+    "feed_stock": {
+      "title": "Feed Stock",
+      "description": "Represents a feed inventory item.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "number"
+        },
+        "threshold": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number"
+        }
+      },
+      "required": ["name", "quantity", "threshold", "unit", "userId", "createdAt"]
+    },
+    "feed_transaction": {
+      "title": "Feed Transaction",
+      "description": "Represents a change in feed inventory.",
+      "type": "object",
+      "properties": {
+        "feedId": {
+          "type": "string"
+        },
+        "stockId": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number"
+        }
+      },
+      "required": ["date", "type", "amount", "userId", "createdAt"]
+    },
+    "alert": {
+      "title": "Alert",
+      "description": "Represents a system alert.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "animalId": {
+          "type": "string"
+        },
+        "isRead": {
+          "type": "boolean"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number"
+        }
+      },
+      "required": ["title", "message", "date", "type", "isRead", "userId", "createdAt"]
+    },
+    "milk_record": {
+      "title": "Milk Record",
+      "description": "Represents a daily milking record.",
+      "type": "object",
+      "properties": {
+        "animalId": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "yieldAmount": {
+          "type": "number"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number"
+        }
+      },
+      "required": ["animalId", "date", "yieldAmount", "userId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/animals/{animalId}": {
+      "schema": {
+        "$ref": "#/entities/animal"
+      },
+      "description": "Collection of all animals owned by the user."
+    },
+    "/animals/{animalId}/treatments/{treatmentId}": {
+      "schema": {
+        "$ref": "#/entities/treatment"
+      },
+      "description": "History of treatments for a specific animal."
+    },
+    "/animals/{animalId}/weight_history/{weightId}": {
+      "schema": {
+        "$ref": "#/entities/weight_record"
+      },
+      "description": "History of weight measurements for a specific animal."
+    },
+    "/animals/{animalId}/photos/{photoId}": {
+      "schema": {
+        "$ref": "#/entities/photo"
+      },
+      "description": "Gallery of animal photos."
+    },
+    "/weightRecords/{weightRecordId}": {
+      "schema": {
+        "$ref": "#/entities/weight_record"
+      },
+      "description": "Root collection of weight measurements for quick access."
+    },
+    "/feedStocks/{feedStockId}": {
+      "schema": {
+        "$ref": "#/entities/feed_stock"
+      },
+      "description": "Inventory of feed products."
+    },
+    "/feedTransactions/{feedTransactionId}": {
+      "schema": {
+        "$ref": "#/entities/feed_transaction"
+      },
+      "description": "History of feed acquisitions and consumptions."
+    },
+    "/alerts/{alertId}": {
+      "schema": {
+        "$ref": "#/entities/alert"
+      },
+      "description": "System alerts to the user."
+    },
+    "/milkRecords/{milkRecordId}": {
+      "schema": {
+        "$ref": "#/entities/milk_record"
+      },
+      "description": "History of daily milk extraction yield."
+    },
+    "/auditLogs/{logId}": {
+      "schema": {
+        "$ref": "#/entities/audit_log"
+      },
+      "description": "Audit logs of admin actions."
+    }
+  }
+}

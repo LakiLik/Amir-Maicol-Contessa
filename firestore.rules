@@ -1,0 +1,285 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- REUSABLE HELPERS ---
+    // Wait, the client SDK uses signin with popup but does it require email_verified? Often yes, but in AI Studio with Google auth it's verified.
+    function isSignedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+
+    // --- ANIMAL VALIDATION ---
+    function isValidAnimalCreate() {
+      let data = incoming();
+      return data.keys().hasAll(['earTag', 'species', 'dateOfBirth', 'healthStatus', 'userId', 'createdAt']) &&
+             data.keys().size() >= 6 && data.keys().size() <= 15 &&
+             data.earTag is string && data.earTag.size() > 0 && data.earTag.size() <= 100 &&
+             data.species is string && data.species.size() > 0 && data.species.size() <= 50 &&
+             data.dateOfBirth is string && data.dateOfBirth.size() <= 20 &&
+             (data.get('breed', '') is string) &&
+             data.healthStatus is string && data.healthStatus.size() <= 100 &&
+             data.userId == request.auth.uid &&
+             data.createdAt is number &&
+             (data.get('updatedAt', 0) is number) &&
+             (data.get('name', '') is string) &&
+             (data.get('gender', '') is string) &&
+             (data.get('motherId', '') is string) &&
+             (data.get('fatherId', '') is string) &&
+             (data.get('photoUrl', '') is string) &&
+             (data.get('currentWeight', 0) is number) &&
+             (data.get('gpsTagId', '') is string) &&
+             (data.get('lastLocation', {}) is map);
+    }
+    
+    function isValidAnimalUpdate() {
+      let data = incoming();
+      return (data.get('earTag', 'valid') is string) &&
+             (data.get('species', 'valid') is string) &&
+             (data.get('dateOfBirth', 'valid') is string) &&
+             (data.get('healthStatus', 'valid') is string) &&
+             (data.get('breed', '') is string) &&
+             (data.get('name', '') is string) &&
+             (data.get('gender', '') is string) &&
+             (data.get('motherId', '') is string) &&
+             (data.get('fatherId', '') is string) &&
+             (data.get('photoUrl', '') is string) &&
+             (data.get('currentWeight', 0) is number) &&
+             (data.get('gpsTagId', '') is string) &&
+             (data.get('lastLocation', {}) is map) &&
+             data.updatedAt is number &&
+             data.userId == existing().userId &&
+             data.createdAt == existing().createdAt;
+    }
+
+    function isValidGeozoneCreate() {
+        let data = incoming();
+        return data.keys().hasAll(['name', 'type', 'userId', 'createdAt']) &&
+               data.keys().size() >= 4 && data.keys().size() <= 7 &&
+               data.name is string && data.name.size() > 0 &&
+               data.type in ['polygon', 'circle'] &&
+               data.userId == request.auth.uid &&
+               data.createdAt is number &&
+               (data.get('bounds', []) is list) &&
+               (data.get('center', {}) is map) &&
+               (data.get('radius', 0) is number);
+    }
+
+    // --- TREATMENT VALIDATION ---
+    function isValidTreatmentCreate() {
+        let data = incoming();
+        return data.keys().hasAll(['date', 'type', 'description', 'userId', 'createdAt']) &&
+               data.keys().size() >= 5 && data.keys().size() <= 7 &&
+               data.date is string && data.date.size() <= 20 &&
+               data.type is string && data.type.size() <= 100 &&
+               data.description is string && data.description.size() <= 1000 &&
+               data.userId == request.auth.uid &&
+               data.createdAt is number &&
+               (data.get('medicine', '') is string) &&
+               (data.get('nextDueDate', '') is string);
+    }
+
+    // --- WEIGHT VALIDATION ---
+    function isValidWeightCreate() {
+        let data = incoming();
+        return data.keys().hasAll(['date', 'weight', 'userId', 'createdAt']) &&
+               data.keys().size() >= 4 && data.keys().size() <= 5 &&
+               data.date is string && data.date.size() <= 20 &&
+               data.weight is number &&
+               data.userId == request.auth.uid &&
+               data.createdAt is number &&
+               (data.get('animalId', '') is string);
+    }
+
+    // --- NEW VALIDATORS ---
+    function isValidPhotoCreate() {
+        let data = incoming();
+        return data.keys().hasAll(['url', 'userId', 'createdAt']) &&
+               data.keys().size() >= 3 && data.keys().size() <= 4 &&
+               data.url is string && data.url.size() > 0 && data.url.size() <= 1000 &&
+               data.userId == request.auth.uid &&
+               data.createdAt is number &&
+               (data.get('description', '') is string);
+    }
+
+    function isValidFeedStockCreate() {
+        let data = incoming();
+        return data.keys().hasAll(['name', 'quantity', 'threshold', 'unit', 'userId', 'createdAt']) &&
+               data.keys().size() >= 6 && data.keys().size() <= 7 &&
+               data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+               data.quantity is number &&
+               data.threshold is number &&
+               data.unit is string && data.unit.size() <= 20 &&
+               data.userId == request.auth.uid &&
+               data.createdAt is number &&
+               (data.get('updatedAt', 0) is number);
+    }
+
+    function isValidFeedTransactionCreate() {
+        let data = incoming();
+        return data.keys().hasAll(['date', 'type', 'amount', 'userId', 'createdAt']) &&
+               data.keys().size() >= 5 && data.keys().size() <= 8 &&
+               data.date is string && data.date.size() <= 20 &&
+               data.type is string && data.type.size() <= 20 &&
+               data.amount is number &&
+               data.userId == request.auth.uid &&
+               data.createdAt is number &&
+               (data.get('feedId', '') is string) &&
+               (data.get('stockId', '') is string) &&
+               (data.get('notes', '') is string);
+    }
+
+    function isValidAlertCreate() {
+        let data = incoming();
+        return data.keys().hasAll(['title', 'message', 'date', 'type', 'isRead', 'userId', 'createdAt']) &&
+               data.keys().size() >= 7 && data.keys().size() <= 8 &&
+               data.title is string && data.title.size() <= 200 &&
+               data.message is string && data.message.size() <= 1000 &&
+               data.date is string && data.date.size() <= 20 &&
+               data.type is string && data.type.size() <= 50 &&
+               data.isRead is bool &&
+               data.userId == request.auth.uid &&
+               data.createdAt is number &&
+               (data.get('animalId', '') is string);
+    }
+
+    function isValidMilkRecordCreate() {
+        let data = incoming();
+        return data.keys().hasAll(['animalId', 'date', 'yieldAmount', 'userId', 'createdAt']) &&
+               data.keys().size() == 5 &&
+               data.animalId is string && data.animalId.size() <= 128 &&
+               data.date is string && data.date.size() <= 20 &&
+               data.yieldAmount is number &&
+               data.userId == request.auth.uid &&
+               data.createdAt is number;
+    }
+
+
+    // --- RULES ROUTING ---
+    match /animals/{animalId} {
+      allow get: if isSignedIn() && isValidId(animalId) && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isSignedIn() && isValidId(animalId) && isValidAnimalCreate();
+      
+      allow update: if isSignedIn() && isValidId(animalId) && existing().userId == request.auth.uid && isValidAnimalUpdate() && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['earTag', 'name', 'species', 'gender', 'dateOfBirth', 'breed', 'healthStatus', 'motherId', 'fatherId', 'photoUrl', 'currentWeight', 'updatedAt', 'gpsTagId', 'lastLocation'])
+      );
+      
+      allow delete: if isSignedIn() && isValidId(animalId) && existing().userId == request.auth.uid;
+
+      match /treatments/{treatmentId} {
+          allow get: if isSignedIn() && isValidId(animalId) && isValidId(treatmentId) && existing().userId == request.auth.uid;
+          allow list: if isSignedIn() && isValidId(animalId) && resource.data.userId == request.auth.uid;
+          
+          allow create: if isSignedIn() && isValidId(animalId) && isValidId(treatmentId) && isValidTreatmentCreate() && (
+              get(/databases/$(database)/documents/animals/$(animalId)).data.userId == request.auth.uid
+          );
+          
+          allow update: if isSignedIn() && isValidId(animalId) && isValidId(treatmentId) && existing().userId == request.auth.uid &&
+              (incoming().get('date', 'v') is string) &&
+              (incoming().get('type', 'v') is string) &&
+              (incoming().get('description', 'v') is string) &&
+              (incoming().get('medicine', '') is string) &&
+              (incoming().get('nextDueDate', '') is string) &&
+              incoming().createdAt == existing().createdAt &&
+              incoming().userId == existing().userId &&
+              (
+                incoming().diff(existing()).affectedKeys().hasOnly(['date', 'type', 'description', 'medicine', 'nextDueDate'])
+              );
+
+          allow delete: if isSignedIn() && isValidId(animalId) && isValidId(treatmentId) && existing().userId == request.auth.uid;
+      }
+
+      match /weight_history/{weightId} {
+          allow get: if isSignedIn() && isValidId(animalId) && isValidId(weightId) && existing().userId == request.auth.uid;
+          allow list: if isSignedIn() && isValidId(animalId) && resource.data.userId == request.auth.uid;
+          
+          allow create: if isSignedIn() && isValidId(animalId) && isValidId(weightId) && isValidWeightCreate() && (
+              get(/databases/$(database)/documents/animals/$(animalId)).data.userId == request.auth.uid
+          );
+          
+          allow delete: if isSignedIn() && isValidId(animalId) && isValidId(weightId) && existing().userId == request.auth.uid;
+      }
+
+      match /photos/{photoId} {
+          allow get: if isSignedIn() && isValidId(animalId) && isValidId(photoId) && existing().userId == request.auth.uid;
+          allow list: if isSignedIn() && isValidId(animalId) && resource.data.userId == request.auth.uid;
+          
+          allow create: if isSignedIn() && isValidId(animalId) && isValidId(photoId) && isValidPhotoCreate() && (
+              get(/databases/$(database)/documents/animals/$(animalId)).data.userId == request.auth.uid
+          );
+          
+          allow delete: if isSignedIn() && isValidId(animalId) && isValidId(photoId) && existing().userId == request.auth.uid;
+      }
+    }
+
+    match /weightRecords/{weightId} {
+        allow get: if isSignedIn() && isValidId(weightId) && existing().userId == request.auth.uid;
+        allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+        allow create: if isSignedIn() && isValidId(weightId) && isValidWeightCreate();
+        allow delete: if isSignedIn() && isValidId(weightId) && existing().userId == request.auth.uid;
+    }
+
+    match /feedStocks/{stockId} {
+        allow get: if isSignedIn() && isValidId(stockId) && existing().userId == request.auth.uid;
+        allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+        allow create: if isSignedIn() && isValidId(stockId) && isValidFeedStockCreate();
+        allow update: if isSignedIn() && isValidId(stockId) && existing().userId == request.auth.uid &&
+            (incoming().get('quantity', 0) is number) &&
+            incoming().userId == existing().userId &&
+            incoming().createdAt == existing().createdAt &&
+            (
+              incoming().diff(existing()).affectedKeys().hasOnly(['quantity', 'updatedAt'])
+            );
+        allow delete: if isSignedIn() && isValidId(stockId) && existing().userId == request.auth.uid;
+    }
+
+    match /feedTransactions/{txId} {
+        allow get: if isSignedIn() && isValidId(txId) && existing().userId == request.auth.uid;
+        allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+        allow create: if isSignedIn() && isValidId(txId) && isValidFeedTransactionCreate();
+        allow delete: if isSignedIn() && isValidId(txId) && existing().userId == request.auth.uid;
+    }
+
+    match /alerts/{alertId} {
+        allow get: if isSignedIn() && isValidId(alertId) && existing().userId == request.auth.uid;
+        allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+        allow create: if isSignedIn() && isValidId(alertId) && isValidAlertCreate();
+        allow update: if isSignedIn() && isValidId(alertId) && existing().userId == request.auth.uid &&
+            (incoming().get('isRead', false) is bool) &&
+            incoming().userId == existing().userId &&
+            incoming().createdAt == existing().createdAt &&
+            (
+              incoming().diff(existing()).affectedKeys().hasOnly(['isRead'])
+            );
+        allow delete: if isSignedIn() && isValidId(alertId) && existing().userId == request.auth.uid;
+    }
+
+    match /milkRecords/{recordId} {
+        allow get: if isSignedIn() && isValidId(recordId) && existing().userId == request.auth.uid;
+        allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+        allow create: if isSignedIn() && isValidId(recordId) && isValidMilkRecordCreate();
+        allow delete: if isSignedIn() && isValidId(recordId) && existing().userId == request.auth.uid;
+    }
+
+    match /auditLogs/{logId} {
+        allow get: if isSignedIn() && isValidId(logId) && existing().userId == request.auth.uid;
+        allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+        allow create: if isSignedIn() && isValidId(logId) && isValidAuditLogCreate();
+        allow delete: if isSignedIn() && isValidId(logId) && existing().userId == request.auth.uid;
+    }
+
+    match /geozones/{zoneId} {
+        allow get: if isSignedIn() && isValidId(zoneId) && existing().userId == request.auth.uid;
+        allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+        allow create: if isSignedIn() && isValidId(zoneId) && isValidGeozoneCreate();
+        allow delete: if isSignedIn() && isValidId(zoneId) && existing().userId == request.auth.uid;
+    }
+  }
+}

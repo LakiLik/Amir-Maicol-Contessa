@@ -1,0 +1,6 @@
+{
+  "name": "Gestione Allevamento",
+  "description": "Applicazione per la gestione del bestiame con sincronizzazione in tempo reale e tracciamento genealogico.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
