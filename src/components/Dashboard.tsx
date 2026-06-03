@@ -22,6 +22,8 @@ export default function Dashboard({ user }: DashboardProps) {
   const [quickAction, setQuickAction] = useState<'none' | 'animal' | 'weight' | 'feed'>('none');
   const [feedStocks, setFeedStocks] = useState<any[]>([]);
 
+  const [weatherError, setWeatherError] = useState(false);
+
   useEffect(() => {
     // Quick Actions setup
     const qFeed = query(collection(db, 'feedStocks'), where('userId', '==', user.uid));
@@ -63,10 +65,13 @@ export default function Dashboard({ user }: DashboardProps) {
     const fetchWeather = async (lat: number, lon: number) => {
        try {
           const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`);
+          if (!res.ok) throw new Error("HTTP error " + res.status);
           const data = await res.json();
           setWeather(data);
+          setWeatherError(false);
        } catch (error) {
           console.error("Meteo non disponibile", error);
+          setWeatherError(true);
        }
     };
     
@@ -188,6 +193,8 @@ export default function Dashboard({ user }: DashboardProps) {
                      <p className="text-[8px] font-mono mt-3 opacity-50 uppercase">Synched: OpenMeteo DLT</p>
                   </div>
                </>
+            ) : weatherError ? (
+               <div className="text-xs font-mono uppercase text-red-500 opacity-80">Meteo non disponibile</div>
             ) : (
                <div className="text-xs font-mono uppercase opacity-50">Ricerca segnale meteo...</div>
             )}
