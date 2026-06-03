@@ -1,9 +1,9 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { User } from 'firebase/auth';
+import type { User } from '@supabase/supabase-js';
 import { Animal, Treatment, WeightRecord } from '../types';
 import { db } from '../lib/firebase';
-import { collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc } from '../lib/db-mock';
 import { subscribeToTreatments, subscribeToWeights, addTreatment, addWeightRecord, updateAnimal } from '../lib/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowLeft, Stethoscope, Scale, GitMerge, FileText, Image as ImageIcon, Camera, UploadCloud, X } from 'lucide-react';
@@ -95,7 +95,7 @@ export default function AnimalDetail({ user }: DetailProps) {
       description: formData.get('description') as string,
       medicine: formData.get('medicine') as string,
       nextDueDate: formData.get('nextDueDate') as string,
-      userId: user.uid,
+      userId: user.id,
     });
     setShowTreatmentModal(false);
   };
@@ -107,7 +107,7 @@ export default function AnimalDetail({ user }: DetailProps) {
     await addWeightRecord(id, {
       date: formData.get('date') as string,
       weight: parseFloat(formData.get('weight') as string),
-      userId: user.uid,
+      userId: user.id,
     });
     setShowWeightModal(false);
   };
@@ -166,7 +166,7 @@ export default function AnimalDetail({ user }: DetailProps) {
     await addDoc(collection(db, 'animals', id, 'photos'), {
       url: formData.get('url'),
       description: formData.get('description') || '',
-      userId: user.uid,
+      userId: user.id,
       createdAt: Date.now()
     });
     setIsPhotoModalOpen(false);

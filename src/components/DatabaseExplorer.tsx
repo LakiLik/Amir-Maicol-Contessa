@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, query, where, doc, setDoc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, setDoc, addDoc } from '../lib/db-mock';
 import { db } from '../lib/firebase';
-import { User } from 'firebase/auth';
+import type { User } from '@supabase/supabase-js';
 import { Database, Download, RefreshCw, Server, FileJson, Search, UploadCloud, ClipboardList } from 'lucide-react';
 
 interface DatabaseExplorerProps {
@@ -33,7 +33,7 @@ export default function DatabaseExplorer({ user }: DatabaseExplorerProps) {
       await addDoc(collection(db, 'auditLogs'), {
         action,
         details,
-        userId: user.uid,
+        userId: user.id,
         createdAt: Date.now()
       });
       if (activeTab === 'audit') {
@@ -50,7 +50,7 @@ export default function DatabaseExplorer({ user }: DatabaseExplorerProps) {
     
     for (const colName of COLLECTIONS) {
       try {
-        const q = query(collection(db, colName), where('userId', '==', user.uid));
+        const q = query(collection(db, colName), where('userId', '==', user.id));
         const snapshot = await getDocs(q);
         dbData[colName] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       } catch (err) {
@@ -66,7 +66,7 @@ export default function DatabaseExplorer({ user }: DatabaseExplorerProps) {
 
   useEffect(() => {
     fetchData();
-  }, [user.uid]);
+  }, [user.id]);
 
   const exportAllJSON = () => {
     const dataStr = JSON.stringify(data, null, 2);

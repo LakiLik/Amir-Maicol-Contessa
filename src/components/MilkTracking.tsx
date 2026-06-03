@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { User } from 'firebase/auth';
-import { collection, query, where, onSnapshot, addDoc } from 'firebase/firestore';
+import type { User } from '@supabase/supabase-js';
+import { collection, query, where, onSnapshot, addDoc } from '../lib/db-mock';
 import { db } from '../lib/firebase';
 import { Animal, MilkRecord } from '../types';
 import { Plus, X, BarChart3, TrendingUp, Trophy } from 'lucide-react';
@@ -12,18 +12,18 @@ export default function MilkTracking({ user }: { user: User }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const qAnimals = query(collection(db, 'animals'), where('userId', '==', user.uid), where('gender', '==', 'F'));
+    const qAnimals = query(collection(db, 'animals'), where('userId', '==', user.id), where('gender', '==', 'F'));
     const unsubAnimals = onSnapshot(qAnimals, (snapshot) => {
       setAnimals(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Animal)));
     });
 
-    const qRecords = query(collection(db, 'milkRecords'), where('userId', '==', user.uid));
+    const qRecords = query(collection(db, 'milkRecords'), where('userId', '==', user.id));
     const unsubRecords = onSnapshot(qRecords, (snapshot) => {
       setRecords(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as MilkRecord)).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
     });
 
     return () => { unsubAnimals(); unsubRecords(); };
-  }, [user.uid]);
+  }, [user.id]);
 
   const handleAddRecord = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,7 +32,7 @@ export default function MilkTracking({ user }: { user: User }) {
         animalId: fd.get('animalId'),
         date: fd.get('date'),
         yieldAmount: Number(fd.get('yieldAmount')),
-        userId: user.uid,
+        userId: user.id,
         createdAt: Date.now()
     });
     setIsModalOpen(false);

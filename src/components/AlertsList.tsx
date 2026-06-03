@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { User } from 'firebase/auth';
-import { collection, query, where, onSnapshot, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import type { User } from '@supabase/supabase-js';
+import { collection, query, where, onSnapshot, addDoc, updateDoc, doc, deleteDoc } from '../lib/db-mock';
 import { db } from '../lib/firebase';
 import { CustomAlert } from '../types';
 import { Plus, Bell, Calendar, Check, X, BellRing, AlertCircle, Trash2 } from 'lucide-react';
@@ -10,13 +10,13 @@ export default function AlertsList({ user }: { user: User }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const q = query(collection(db, 'alerts'), where('userId', '==', user.uid));
+    const q = query(collection(db, 'alerts'), where('userId', '==', user.id));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as CustomAlert)).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
       setAlerts(data);
     });
     return unsubscribe;
-  }, [user.uid]);
+  }, [user.id]);
 
   const handleCreateAlert = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,7 +28,7 @@ export default function AlertsList({ user }: { user: User }) {
       type: fd.get('type'),
       animalId: fd.get('animalId') || '',
       isRead: false,
-      userId: user.uid,
+      userId: user.id,
       createdAt: Date.now()
     });
     setIsModalOpen(false);

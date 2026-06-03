@@ -1,10 +1,10 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { User } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import type { User } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 import { LayoutDashboard, TableProperties, LogOut, Menu, X, Wheat, Droplet, Bell, Database, Map } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+// import { collection, query, where, onSnapshot } from '../lib/db-mock';
+// import { db } from '../lib/firebase';
 import { CustomAlert } from '../types';
 
 interface LayoutProps {
@@ -37,13 +37,13 @@ export default function Layout({ user }: LayoutProps) {
     };
   }, []);
 
-  useEffect(() => {
-    const q = query(collection(db, 'alerts'), where('userId', '==', user.uid), where('isRead', '==', false));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setUnreadAlerts(snapshot.docs.length);
-    });
-    return unsubscribe;
-  }, [user.uid]);
+  // useEffect(() => {
+  //   const q = query(collection(db, 'alerts'), where('userId', '==', user.id), where('isRead', '==', false));
+  //   const unsubscribe = onSnapshot(q, (snapshot) => {
+  //     setUnreadAlerts(snapshot.docs.length);
+  //   });
+  //   return unsubscribe;
+  // }, [user.id]);
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -110,19 +110,15 @@ export default function Layout({ user }: LayoutProps) {
         <div className="mt-auto border-t border-[#141414] pt-4 space-y-4">
           <p className="font-serif italic text-[11px] uppercase opacity-50 block mb-2">Operatore</p>
           <div className="flex items-center space-x-3 bg-white border border-[#141414] shadow-[4px_4px_0px_0px_#141414] p-3">
-            {user.photoURL ? (
-              <img src={user.photoURL} alt="" className="w-8 h-8 border border-[#141414]" />
-            ) : (
-              <div className="w-8 h-8 bg-[#141414] text-[#E4E3E0] flex items-center justify-center font-bold text-xs">
-                {user.email?.[0].toUpperCase()}
-              </div>
-            )}
+            <div className="w-8 h-8 bg-[#141414] text-[#E4E3E0] flex items-center justify-center font-bold text-xs">
+              {user.email?.[0].toUpperCase() || 'U'}
+            </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold font-mono tracking-tighter uppercase truncate text-[#141414]">{user.displayName || user.email?.split('@')[0]}</p>
+              <p className="text-[10px] font-bold font-mono tracking-tighter uppercase truncate text-[#141414]">{user.email?.split('@')[0]}</p>
               <p className="text-[9px] font-mono opacity-50 truncate">{user.email}</p>
             </div>
             <button
-              onClick={() => auth.signOut()}
+              onClick={() => supabase.auth.signOut()}
               className="p-1 border border-[#141414] hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors"
               title="Esci"
             >

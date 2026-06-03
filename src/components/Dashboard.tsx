@@ -1,14 +1,14 @@
 import { useEffect, useState, FormEvent } from 'react';
-import { User } from 'firebase/auth';
+import type { User } from '@supabase/supabase-js';
 import { subscribeToAnimals } from '../lib/api';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs } from '../lib/db-mock';
 import { db } from '../lib/firebase';
 import { Animal, WeightRecord } from '../types';
 import { Activity, Users, AlertCircle, Calendar, CloudRain, Sun, Cloud, Thermometer, Wind, SmartphoneNfc } from 'lucide-react';
 import { format, isAfter, subDays, parseISO } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
-import { addDoc, doc, updateDoc, increment } from 'firebase/firestore';
+import { addDoc, doc, updateDoc, increment } from '../lib/db-mock';
 
 interface DashboardProps {
   user: User;
@@ -26,15 +26,15 @@ export default function Dashboard({ user }: DashboardProps) {
 
   useEffect(() => {
     // Quick Actions setup
-    const qFeed = query(collection(db, 'feedStocks'), where('userId', '==', user.uid));
+    const qFeed = query(collection(db, 'feedStocks'), where('userId', '==', user.id));
     getDocs(qFeed).then(snap => {
        setFeedStocks(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
-    const unsub = subscribeToAnimals(user.uid, async (data) => {
+    const unsub = subscribeToAnimals(user.id, async (data) => {
       setAnimals(data);
       
       // Fetch weight records to calculate monthly averages
-      const q = query(collection(db, 'weightRecords'), where('userId', '==', user.uid));
+      const q = query(collection(db, 'weightRecords'), where('userId', '==', user.id));
       const querySnapshot = await getDocs(q);
       const records: WeightRecord[] = [];
       querySnapshot.forEach((doc) => {
@@ -85,7 +85,7 @@ export default function Dashboard({ user }: DashboardProps) {
     }
 
     return () => unsub();
-  }, [user.uid]);
+  }, [user.id]);
 
   const totalAnimals = animals.length;
   const sickAnimals = animals.filter(a => a.healthStatus?.toLowerCase() !== 'sano' && a.healthStatus?.toLowerCase() !== 'healthy').length;
@@ -114,7 +114,7 @@ export default function Dashboard({ user }: DashboardProps) {
            species: fd.get('species') as string,
            dateOfBirth: fd.get('dateOfBirth') as string,
            healthStatus: 'Sano',
-           userId: user.uid,
+           userId: user.id,
            createdAt: Date.now()
         };
         await addDoc(collection(db, 'animals'), animalData);
@@ -123,7 +123,7 @@ export default function Dashboard({ user }: DashboardProps) {
            animalId: fd.get('animalId'),
            date: fd.get('date'),
            weight: Number(fd.get('weight')),
-           userId: user.uid,
+           userId: user.id,
            createdAt: Date.now()
         });
      } else if (quickAction === 'feed') {
@@ -136,7 +136,7 @@ export default function Dashboard({ user }: DashboardProps) {
            amount,
            date: new Date().toISOString().split('T')[0],
            notes: 'Aggiunta Rapida',
-           userId: user.uid,
+           userId: user.id,
            createdAt: Date.now()
         });
         await updateDoc(doc(db, 'feedStocks', stockId), {

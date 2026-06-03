@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { User } from 'firebase/auth';
-import { collection, query, where, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import type { User } from '@supabase/supabase-js';
+import { collection, query, where, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from '../lib/db-mock';
 import { db } from '../lib/firebase';
 import { Animal, Geozone, CustomAlert } from '../types';
 import { APIProvider, Map, AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
@@ -24,12 +24,12 @@ export default function MapArea({ user }: MapAreaProps) {
   const [mode, setMode] = useState<'view' | 'draw_circle'>('view');
 
   useEffect(() => {
-    const qA = query(collection(db, 'animals'), where('userId', '==', user.uid));
+    const qA = query(collection(db, 'animals'), where('userId', '==', user.id));
     const unsubA = onSnapshot(qA, (snap) => {
       setAnimals(snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Animal)));
     });
 
-    const qG = query(collection(db, 'geozones'), where('userId', '==', user.uid));
+    const qG = query(collection(db, 'geozones'), where('userId', '==', user.id));
     const unsubG = onSnapshot(qG, (snap) => {
       setGeozones(snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Geozone)));
       setLoading(false);
@@ -39,7 +39,7 @@ export default function MapArea({ user }: MapAreaProps) {
       unsubA();
       unsubG();
     };
-  }, [user.uid]);
+  }, [user.id]);
 
   const addGeozone = async (lat: number, lng: number) => {
     // Basic implementation: add a circle geozone of 500m radius
@@ -49,7 +49,7 @@ export default function MapArea({ user }: MapAreaProps) {
           type: 'circle',
           center: { lat, lng },
           radius: 100, // 100 meters
-          userId: user.uid,
+          userId: user.id,
           createdAt: Date.now()
        });
        setMode('view');

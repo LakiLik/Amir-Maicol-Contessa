@@ -1,4 +1,4 @@
-import { collection, doc, setDoc, deleteDoc, getDocs, onSnapshot, query, where, updateDoc } from 'firebase/firestore';
+import { collection, doc, setDoc, deleteDoc, getDocs, onSnapshot, query, where, updateDoc } from '../lib/db-mock';
 import { db, handleFirestoreError, OperationType } from './firebase';
 import { Animal, Treatment, WeightRecord } from '../types';
 

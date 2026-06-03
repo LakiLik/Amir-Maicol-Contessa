@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent, useRef, ChangeEvent } from 'react';
-import { User } from 'firebase/auth';
+import type { User } from '@supabase/supabase-js';
 import { Animal } from '../types';
 import { subscribeToAnimals, addAnimal, deleteAnimal, updateAnimal } from '../lib/api';
 import { Link } from 'react-router-dom';
@@ -42,12 +42,12 @@ export default function AnimalGrid({ user }: GridProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const unsub = subscribeToAnimals(user.uid, (data) => {
+    const unsub = subscribeToAnimals(user.id, (data) => {
       setAnimals(data);
       setLoading(false);
     });
     return () => unsub();
-  }, [user.uid]);
+  }, [user.id]);
 
   const filteredAnimals = animals.filter(a => 
     a.earTag.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -106,7 +106,7 @@ export default function AnimalGrid({ user }: GridProps) {
                 dateOfBirth: String(row.DataNascita || row.dateOfBirth || new Date().toISOString().split('T')[0]),
                 healthStatus: String(row.Salute || row.healthStatus || 'Sano'),
                 gender: String(row.Sesso || row.gender || 'F'),
-                userId: user.uid,
+                userId: user.id,
                 createdAt: Date.now()
             };
             if (animalData.earTag) {
@@ -189,11 +189,11 @@ export default function AnimalGrid({ user }: GridProps) {
       breed: formData.get('breed') as string,
       healthStatus: formData.get('healthStatus') as string,
       photoUrl: formData.get('photoUrl') as string,
-      userId: user.uid,
+      userId: user.id,
     };
 
     if (editingAnimal) {
-      await updateAnimal(editingAnimal.id, data, user.uid);
+      await updateAnimal(editingAnimal.id, data, user.id);
     } else {
       await addAnimal(data);
     }

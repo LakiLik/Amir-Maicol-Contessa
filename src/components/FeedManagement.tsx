@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { User } from 'firebase/auth';
-import { collection, query, where, onSnapshot, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import type { User } from '@supabase/supabase-js';
+import { collection, query, where, onSnapshot, addDoc, updateDoc, doc, deleteDoc } from '../lib/db-mock';
 import { db } from '../lib/firebase';
 import { FeedStock, FeedTransaction } from '../types';
 import { Plus, Minus, AlertTriangle, ArrowDown, ArrowUp, X } from 'lucide-react';
@@ -14,17 +14,17 @@ export default function FeedManagement({ user }: { user: User }) {
   const [selectedFeedId, setSelectedFeedId] = useState<string>('');
 
   useEffect(() => {
-    const qStocks = query(collection(db, 'feedStocks'), where('userId', '==', user.uid));
+    const qStocks = query(collection(db, 'feedStocks'), where('userId', '==', user.id));
     const unsubStocks = onSnapshot(qStocks, (snap) => setStocks(snap.docs.map(d => ({ id: d.id, ...d.data() } as FeedStock))));
 
-    const qTrans = query(collection(db, 'feedTransactions'), where('userId', '==', user.uid));
+    const qTrans = query(collection(db, 'feedTransactions'), where('userId', '==', user.id));
     const unsubTrans = onSnapshot(qTrans, (snap) => {
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as FeedTransaction)).sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       setTransactions(data);
     });
 
     return () => { unsubStocks(); unsubTrans(); };
-  }, [user.uid]);
+  }, [user.id]);
 
   const handleCreateStock = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,7 +34,7 @@ export default function FeedManagement({ user }: { user: User }) {
       quantity: 0,
       threshold: Number(fd.get('threshold')),
       unit: fd.get('unit'),
-      userId: user.uid,
+      userId: user.id,
       createdAt: Date.now()
     });
     setIsStockModalOpen(false);
@@ -55,7 +55,7 @@ export default function FeedManagement({ user }: { user: User }) {
       type: transType,
       amount: amount,
       notes: fd.get('notes') || '',
-      userId: user.uid,
+      userId: user.id,
       createdAt: Date.now()
     });
 
@@ -71,7 +71,7 @@ export default function FeedManagement({ user }: { user: User }) {
         date: new Date().toISOString().split('T')[0],
         type: 'feed',
         isRead: false,
-        userId: user.uid,
+        userId: user.id,
         createdAt: Date.now()
       });
     }
