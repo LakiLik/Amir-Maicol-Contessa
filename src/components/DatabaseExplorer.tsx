@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { collection, getDocs, query, where, doc, setDoc, addDoc } from '../lib/db-mock';
-import { db } from '../lib/firebase';
+import { db } from '../lib/db-mock';
 import type { User } from '@supabase/supabase-js';
 import { Database, Download, RefreshCw, Server, FileJson, Search, UploadCloud, ClipboardList } from 'lucide-react';
 

@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase';
+import React, { useState } from 'react';
 import { LogIn } from 'lucide-react';
-import { useState } from 'react';
 
 export default function Auth() {
   const [errorMsg, setErrorMsg] = useState('');
@@ -13,18 +13,12 @@ export default function Auth() {
     try {
       setErrorMsg('');
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
+        const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        setErrorMsg('Registrazione completata! Puoi accedere subito (se hai disabilitato la "Confirm email" nella console Supabase -> Authentication -> Providers -> Email). Altrimenti controlla la tua email.');
+        setErrorMsg('Registrato. Controlla email o accedi.');
         setIsSignUp(false);
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
     } catch (error: any) {
@@ -43,50 +37,44 @@ export default function Auth() {
           <p className="mt-2 text-xs font-bold font-mono uppercase tracking-widest opacity-60">Autenticazione Operatore</p>
         </div>
         
-        {(!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) ? (
-          <div className="p-4 bg-yellow-100 border-2 border-yellow-500 text-yellow-800 text-xs font-mono">
-             Devi configurare <strong>VITE_SUPABASE_URL</strong> e <strong>VITE_SUPABASE_ANON_KEY</strong> nel tuo file .env per usare l'autenticazione.
+        <form onSubmit={handleAuth} className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold font-mono uppercase tracking-wider mb-2">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-[#E4E3E0] border-2 border-[#141414] p-3 outline-none focus:bg-white transition-colors"
+              required
+            />
           </div>
-        ) : (
-          <form onSubmit={handleAuth} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold font-mono uppercase tracking-wider mb-2">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#E4E3E0] border-2 border-[#141414] p-3 outline-none focus:bg-white transition-colors"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold font-mono uppercase tracking-wider mb-2">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#E4E3E0] border-2 border-[#141414] p-3 outline-none focus:bg-white transition-colors"
-                required
-              />
-            </div>
+          <div>
+            <label className="block text-xs font-bold font-mono uppercase tracking-wider mb-2">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-[#E4E3E0] border-2 border-[#141414] p-3 outline-none focus:bg-white transition-colors"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full flex items-center justify-center space-x-2 bg-[#141414] hover:bg-white hover:text-[#141414] hover:border-[#141414] text-[#E4E3E0] border-2 border-transparent p-4 font-bold uppercase tracking-widest text-xs transition-colors outline-none shadow-[4px_4px_0px_0px_#141414]"
+          >
+            <LogIn size={20} />
+            <span>{isSignUp ? 'Registrati' : 'Accedi'}</span>
+          </button>
+          <div className="text-center mt-4">
             <button
-              type="submit"
-              className="w-full flex items-center justify-center space-x-2 bg-[#141414] hover:bg-white hover:text-[#141414] hover:border-[#141414] text-[#E4E3E0] border-2 border-transparent p-4 font-bold uppercase tracking-widest text-xs transition-colors outline-none shadow-[4px_4px_0px_0px_#141414]"
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-xs font-bold font-mono uppercase tracking-widest hover:underline"
             >
-              <LogIn size={20} />
-              <span>{isSignUp ? 'Registrati' : 'Accedi'}</span>
+              {isSignUp ? 'Hai già un account? Accedi' : 'Non hai un account? Registrati'}
             </button>
-            <div className="text-center mt-4">
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-xs font-bold font-mono uppercase tracking-widest hover:underline"
-              >
-                {isSignUp ? 'Hai già un account? Accedi' : 'Non hai un account? Registrati'}
-              </button>
-            </div>
-          </form>
-        )}
+          </div>
+        </form>
 
         {errorMsg && (
           <div className="mt-4 p-3 bg-red-100 border-2 border-red-500 text-red-700 text-xs font-mono break-words">

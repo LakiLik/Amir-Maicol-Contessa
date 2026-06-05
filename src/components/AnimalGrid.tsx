@@ -14,8 +14,8 @@ interface GridProps {
   user: User;
 }
 
-export default function AnimalGrid({ user }: GridProps) {
-  const [animals, setAnimals] = useState<Animal[]>([]);
+
+export default function AnimalGrid({ user }: GridProps) {  const [animals, setAnimals] = useState<Animal[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -189,6 +189,8 @@ export default function AnimalGrid({ user }: GridProps) {
       breed: formData.get('breed') as string,
       healthStatus: formData.get('healthStatus') as string,
       photoUrl: formData.get('photoUrl') as string,
+      motherId: formData.get('motherId') as string || undefined,
+      fatherId: formData.get('fatherId') as string || undefined,
       userId: user.id,
     };
 
@@ -226,7 +228,7 @@ export default function AnimalGrid({ user }: GridProps) {
           <button onClick={() => setIsPdfModalOpen(true)} className="text-xs border border-[#141414] bg-white px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
             Exp PDF
           </button>
-          <button onClick={() => setIsModalOpen(true)} className="flex items-center text-xs border border-[#141414] bg-[#141414] text-[#E4E3E0] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#E4E3E0] hover:text-[#141414] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+          <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center text-xs border border-[#141414] bg-[#141414] text-[#E4E3E0] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#E4E3E0] hover:text-[#141414] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
             <Plus size={14} className="mr-1" />
             Nuovo Capo
           </button>
@@ -376,6 +378,24 @@ export default function AnimalGrid({ user }: GridProps) {
                     <div className="col-span-2">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Razza</label>
                       <input type="text" name="breed" defaultValue={editingAnimal?.breed} className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                    </div>
+                    <div className="col-span-2 sm:col-span-1">
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Madre (Opzionale)</label>
+                      <select name="motherId" defaultValue={editingAnimal?.motherId || ''} className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414] font-mono">
+                        <option value="">-- Seleziona --</option>
+                        {animals.filter(a => a.gender === 'F' && a.id !== editingAnimal?.id).map(a => (
+                          <option key={a.id} value={a.id}>{a.earTag} {a.name ? `(${a.name})` : ''}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-span-2 sm:col-span-1">
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Padre (Opzionale)</label>
+                      <select name="fatherId" defaultValue={editingAnimal?.fatherId || ''} className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414] font-mono">
+                        <option value="">-- Seleziona --</option>
+                        {animals.filter(a => a.gender === 'M' && a.id !== editingAnimal?.id).map(a => (
+                          <option key={a.id} value={a.id}>{a.earTag} {a.name ? `(${a.name})` : ''}</option>
+                        ))}
+                      </select>
                     </div>
                     <div className="col-span-2">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">URL Foto (CDN)</label>

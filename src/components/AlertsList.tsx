@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { collection, query, where, onSnapshot, addDoc, updateDoc, doc, deleteDoc } from '../lib/db-mock';
-import { db } from '../lib/firebase';
+import { db } from '../lib/db-mock';
 import { CustomAlert } from '../types';
 import { Plus, Bell, Calendar, Check, X, BellRing, AlertCircle, Trash2 } from 'lucide-react';
 
@@ -60,7 +60,7 @@ export default function AlertsList({ user }: { user: User }) {
           <h1 className="text-3xl font-bold tracking-tighter uppercase mb-2">Centro Avvisi</h1>
           <p className="font-serif italic text-sm uppercase opacity-60">Scadenze, nascite & eventi</p>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="flex items-center text-xs border border-[#141414] bg-[#141414] text-[#E4E3E0] px-4 py-3 font-bold uppercase tracking-widest hover:bg-white hover:text-[#141414] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+        <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center text-xs border border-[#141414] bg-[#141414] text-[#E4E3E0] px-4 py-3 font-bold uppercase tracking-widest hover:bg-white hover:text-[#141414] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
           <Plus size={14} className="mr-2" /> Nuovo Avviso
         </button>
       </div>

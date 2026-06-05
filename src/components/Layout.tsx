@@ -1,10 +1,10 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { LayoutDashboard, TableProperties, LogOut, Menu, X, Wheat, Droplet, Bell, Database, Map } from 'lucide-react';
+import { LayoutDashboard, TableProperties, LogOut, Menu, X, Wheat, Droplet, Bell, Database, Map, Users, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
 // import { collection, query, where, onSnapshot } from '../lib/db-mock';
-// import { db } from '../lib/firebase';
+// import { db } from '../lib/db-mock';
 import { CustomAlert } from '../types';
 
 interface LayoutProps {
@@ -52,6 +52,7 @@ export default function Layout({ user }: LayoutProps) {
     { name: 'Mappa Pascoli', href: '/map', icon: Map },
     { name: 'Magazzino Alimentare', href: '/feed', icon: Wheat },
     { name: 'Avvisi e Scadenze', href: '/alerts', icon: Bell, count: unreadAlerts },
+    { name: 'Collaboratori', href: '/collaborators', icon: Users },
     { name: 'Database Raw (Admin)', href: '/database', icon: Database },
   ];
 
@@ -60,12 +61,17 @@ export default function Layout({ user }: LayoutProps) {
       {/* Mobile menu button */}
       <div className="md:hidden fixed top-0 w-full z-50 bg-[#E4E3E0] border-b border-[#141414] px-4 h-16 flex items-center justify-between">
         <span className="text-xl font-bold tracking-tighter uppercase">AgroSync <span className="font-normal italic font-serif opacity-70">Pro</span></span>
-        <button
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="p-2 -mr-2 text-[#141414] opacity-70 border border-transparent hover:border-[#141414]"
-        >
-          {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex items-center gap-2">
+           <button onClick={() => window.location.reload()} className="p-2 border border-[#141414] bg-white shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer" title="Aggiorna dati">
+             <RefreshCw size={16} />
+           </button>
+           <button
+             onClick={() => setIsMobileOpen(!isMobileOpen)}
+             className="p-2 text-[#141414] opacity-70 border border-transparent hover:border-[#141414]"
+           >
+             {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
+           </button>
+        </div>
       </div>
 
       {/* Sidebar */}
@@ -132,6 +138,9 @@ export default function Layout({ user }: LayoutProps) {
       <main className="flex-1 overflow-y-auto flex flex-col">
         {/* Top Status Bar desktop */}
         <header className="hidden md:flex items-center justify-end px-6 py-4 border-b border-[#141414]">
+           <button type="button" onClick={() => window.location.reload()} className="flex items-center gap-2 px-3 py-1 mr-4 border border-[#141414] bg-white font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] shadow-[2px_2px_0px_0px_#141414] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
+              <RefreshCw size={12} /> Aggiorna Dati
+           </button>
            <div className={`flex items-center px-3 py-1 font-mono text-[10px] uppercase font-bold tracking-widest border border-[#141414] mr-4 transition-colors ${isOnline ? 'bg-white text-[#141414]' : 'bg-red-100 text-red-900 border-red-900'}`}>
               <span className={`w-2 h-2 rounded-full mr-2 ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
               {isOnline ? 'ONLINE' : 'OFFLINE'}

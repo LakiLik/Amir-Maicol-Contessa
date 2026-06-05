@@ -1,14 +1,13 @@
 import { useEffect, useState, FormEvent } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { subscribeToAnimals } from '../lib/api';
-import { collection, query, where, getDocs } from '../lib/db-mock';
-import { db } from '../lib/firebase';
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, increment } from '../lib/db-mock';
+import { db } from '../lib/db-mock';
 import { Animal, WeightRecord } from '../types';
 import { Activity, Users, AlertCircle, Calendar, CloudRain, Sun, Cloud, Thermometer, Wind, SmartphoneNfc } from 'lucide-react';
 import { format, isAfter, subDays, parseISO } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
-import { addDoc, doc, updateDoc, increment } from '../lib/db-mock';
 
 interface DashboardProps {
   user: User;
@@ -23,40 +22,47 @@ export default function Dashboard({ user }: DashboardProps) {
   const [feedStocks, setFeedStocks] = useState<any[]>([]);
 
   const [weatherError, setWeatherError] = useState(false);
+  const [quickActionMenuOpen, setQuickActionMenuOpen] = useState(false);
 
   useEffect(() => {
     // Quick Actions setup
     const qFeed = query(collection(db, 'feedStocks'), where('userId', '==', user.id));
     getDocs(qFeed).then(snap => {
        setFeedStocks(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    });
+    }).catch(err => console.error("Error fetching feedStocks", err));
+    
     const unsub = subscribeToAnimals(user.id, async (data) => {
       setAnimals(data);
       
-      // Fetch weight records to calculate monthly averages
-      const q = query(collection(db, 'weightRecords'), where('userId', '==', user.id));
-      const querySnapshot = await getDocs(q);
-      const records: WeightRecord[] = [];
-      querySnapshot.forEach((doc) => {
-         records.push({ id: doc.id, ...doc.data() } as WeightRecord);
-      });
+      try {
+        // Fetch weight records to calculate monthly averages
+        const q = query(collection(db, 'weightRecords'), where('userId', '==', user.id));
+        const querySnapshot = await getDocs(q);
+        const records: WeightRecord[] = [];
+        querySnapshot.forEach((doc: any) => {
+           records.push({ id: doc.id, ...doc.data() } as WeightRecord);
+        });
 
-      // Group by month YYYY-MM
-      const monthlyData: Record<string, { total: number; count: number }> = {};
-      records.forEach(r => {
-         const month = r.date.substring(0, 7); // "2024-05"
-         if (!monthlyData[month]) monthlyData[month] = { total: 0, count: 0 };
-         monthlyData[month].total += r.weight;
-         monthlyData[month].count += 1;
-      });
+        // Group by month YYYY-MM
+        const monthlyData: Record<string, { total: number; count: number }> = {};
+        records.forEach(r => {
+           const month = r.date ? r.date.substring(0, 7) : 'Unknown';
+           if (!monthlyData[month]) monthlyData[month] = { total: 0, count: 0 };
+           monthlyData[month].total += r.weight;
+           monthlyData[month].count += 1;
+        });
 
-      const chartData = Object.keys(monthlyData).sort().map(month => ({
-         month,
-         media: Number((monthlyData[month].total / monthlyData[month].count).toFixed(1))
-      }));
+        const chartData = Object.keys(monthlyData).sort().map(month => ({
+           month,
+           media: Number((monthlyData[month].total / monthlyData[month].count).toFixed(1))
+        }));
 
-      setWeightData(chartData);
-      setLoading(false);
+        setWeightData(chartData);
+      } catch (err) {
+        console.error("Error processing weights in dashboard", err);
+      } finally {
+        setLoading(false);
+      }
     });
 
     // Fetch Weather (Default: Rome coordinates)
@@ -70,7 +76,7 @@ export default function Dashboard({ user }: DashboardProps) {
           setWeather(data);
           setWeatherError(false);
        } catch (error) {
-          console.error("Meteo non disponibile", error);
+          console.warn("Meteo non disponibile", error);
           setWeatherError(true);
        }
     };
@@ -108,42 +114,47 @@ export default function Dashboard({ user }: DashboardProps) {
      e.preventDefault();
      const fd = new FormData(e.currentTarget);
      
-     if (quickAction === 'animal') {
-        const animalData = {
-           earTag: fd.get('earTag') as string,
-           species: fd.get('species') as string,
-           dateOfBirth: fd.get('dateOfBirth') as string,
-           healthStatus: 'Sano',
-           userId: user.id,
-           createdAt: Date.now()
-        };
-        await addDoc(collection(db, 'animals'), animalData);
-     } else if (quickAction === 'weight') {
-        await addDoc(collection(db, 'weightRecords'), {
-           animalId: fd.get('animalId'),
-           date: fd.get('date'),
-           weight: Number(fd.get('weight')),
-           userId: user.id,
-           createdAt: Date.now()
-        });
-     } else if (quickAction === 'feed') {
-        const type = fd.get('type') as string;
-        const amount = Number(fd.get('amount'));
-        const stockId = fd.get('stockId') as string;
-        await addDoc(collection(db, 'feedTransactions'), {
-           stockId,
-           type,
-           amount,
-           date: new Date().toISOString().split('T')[0],
-           notes: 'Aggiunta Rapida',
-           userId: user.id,
-           createdAt: Date.now()
-        });
-        await updateDoc(doc(db, 'feedStocks', stockId), {
-           quantity: increment(type === 'in' ? amount : -amount)
-        });
+     try {
+       if (quickAction === 'animal') {
+          const animalData = {
+             earTag: fd.get('earTag') as string,
+             species: fd.get('species') as string,
+             dateOfBirth: fd.get('dateOfBirth') as string,
+             healthStatus: 'Sano',
+             userId: user.id,
+             createdAt: Date.now()
+          };
+          await addDoc(collection(db, 'animals'), animalData);
+       } else if (quickAction === 'weight') {
+          await addDoc(collection(db, 'weightRecords'), {
+             animalId: fd.get('animalId'),
+             date: fd.get('date'),
+             weight: Number(fd.get('weight')),
+             userId: user.id,
+             createdAt: Date.now()
+          });
+       } else if (quickAction === 'feed') {
+          const type = fd.get('type') as string;
+          const amount = Number(fd.get('amount'));
+          const stockId = fd.get('stockId') as string;
+          await addDoc(collection(db, 'feedTransactions'), {
+             stockId,
+             type,
+             amount,
+             date: new Date().toISOString().split('T')[0],
+             notes: 'Aggiunta Rapida',
+             userId: user.id,
+             createdAt: Date.now()
+          });
+          await updateDoc(doc(db, 'feedStocks', stockId), {
+             quantity: increment(type === 'in' ? amount : -amount)
+          });
+       }
+     } catch (err) {
+       console.error("Quick action failed:", err);
+     } finally {
+       setQuickAction('none');
      }
-     setQuickAction('none');
   };
 
   const getWeatherIcon = (code: number) => {
@@ -232,7 +243,7 @@ export default function Dashboard({ user }: DashboardProps) {
                   <div className="h-64 flex items-center justify-center text-xs font-mono opacity-50 uppercase tracking-widest border border-dashed border-[#141414]">Dati insufficienti</div>
                ) : (
                   <div className="h-72 w-full font-mono text-xs">
-                     <ResponsiveContainer width="100%" height="100%">
+                     <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                         <AreaChart data={weightData} margin={{ top: 10, right: 10, bottom: 5, left: -20 }}>
                            <defs>
                               <linearGradient id="colorMedia" x1="0" y1="0" x2="0" y2="1">
@@ -261,7 +272,7 @@ export default function Dashboard({ user }: DashboardProps) {
                      <div className="py-10 text-center text-xs font-mono opacity-50">Nessun dato.</div>
                   ) : (
                      <div className="h-48 w-full font-mono text-xs">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                            <PieChart>
                               <Pie data={healthData} cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={2} dataKey="value" stroke="none">
                                  {healthData.map((entry, index) => (
@@ -309,14 +320,14 @@ export default function Dashboard({ user }: DashboardProps) {
       </div>
 
       {/* Floating Quick Actions Button */}
-      <div className="fixed bottom-6 right-6 z-40 group flex flex-col items-end">
-         <div className="flex flex-col gap-2 mb-2 origin-bottom scale-y-0 opacity-0 group-hover:scale-y-100 group-hover:opacity-100 transition-all duration-200">
-            <button onClick={() => setQuickAction('animal')} className="px-4 py-2 bg-white border border-[#141414] shadow-[2px_2px_0px_0px_#141414] text-[10px] font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] whitespace-nowrap">Nuovo Capo</button>
-            <button onClick={() => setQuickAction('weight')} className="px-4 py-2 bg-white border border-[#141414] shadow-[2px_2px_0px_0px_#141414] text-[10px] font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] whitespace-nowrap">Registra Peso</button>
-            <button onClick={() => setQuickAction('feed')} className="px-4 py-2 bg-white border border-[#141414] shadow-[2px_2px_0px_0px_#141414] text-[10px] font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] whitespace-nowrap">Movimento Feed</button>
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
+         <div className={`flex flex-col gap-2 mb-2 origin-bottom transition-all duration-200 ${quickActionMenuOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0 pointer-events-none'}`}>
+            <button onClick={() => { setQuickAction('animal'); setQuickActionMenuOpen(false); }} className="px-4 py-2 bg-white border border-[#141414] shadow-[2px_2px_0px_0px_#141414] text-[10px] font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] whitespace-nowrap cursor-pointer">Nuovo Capo</button>
+            <button onClick={() => { setQuickAction('weight'); setQuickActionMenuOpen(false); }} className="px-4 py-2 bg-white border border-[#141414] shadow-[2px_2px_0px_0px_#141414] text-[10px] font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] whitespace-nowrap cursor-pointer">Registra Peso</button>
+            <button onClick={() => { setQuickAction('feed'); setQuickActionMenuOpen(false); }} className="px-4 py-2 bg-white border border-[#141414] shadow-[2px_2px_0px_0px_#141414] text-[10px] font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] whitespace-nowrap cursor-pointer">Movimento Feed</button>
          </div>
-         <button className="w-14 h-14 bg-[#141414] text-[#E4E3E0] border border-[#141414] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] flex items-center justify-center hover:bg-[#E4E3E0] hover:text-[#141414] transition-colors rounded-full relative z-40 focus:outline-none">
-            <div className="text-2xl">+</div>
+         <button onClick={() => setQuickActionMenuOpen(!quickActionMenuOpen)} className="w-14 h-14 bg-[#141414] text-[#E4E3E0] border border-[#141414] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] flex items-center justify-center hover:bg-[#E4E3E0] hover:text-[#141414] transition-colors rounded-full relative z-40 focus:outline-none cursor-pointer">
+            <div className={`text-2xl transition-transform ${quickActionMenuOpen ? 'rotate-45' : ''}`}>+</div>
          </button>
       </div>
 

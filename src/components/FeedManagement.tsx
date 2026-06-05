@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { collection, query, where, onSnapshot, addDoc, updateDoc, doc, deleteDoc } from '../lib/db-mock';
-import { db } from '../lib/firebase';
+import { db } from '../lib/db-mock';
 import { FeedStock, FeedTransaction } from '../types';
 import { Plus, Minus, AlertTriangle, ArrowDown, ArrowUp, X } from 'lucide-react';
 
@@ -87,7 +87,7 @@ export default function FeedManagement({ user }: { user: User }) {
           <p className="font-serif italic text-sm uppercase opacity-60">Controllo scorte e prelievi</p>
         </div>
         <div className="flex space-x-2">
-           <button onClick={() => setIsStockModalOpen(true)} className="flex items-center text-xs border border-[#141414] bg-white text-[#141414] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+           <button type="button" onClick={() => setIsStockModalOpen(true)} className="flex items-center text-xs border border-[#141414] bg-white text-[#141414] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
             <Plus size={14} className="mr-2" /> Nuovo Articolo
           </button>
         </div>

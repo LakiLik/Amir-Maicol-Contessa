@@ -1,13 +1,14 @@
-import { collection, doc, setDoc, deleteDoc, getDocs, onSnapshot, query, where, updateDoc } from '../lib/db-mock';
-import { db, handleFirestoreError, OperationType } from './firebase';
+import { collection, doc, setDoc, deleteDoc, getDocs, onSnapshot, query, where, updateDoc } from './db-mock';
+import { db, handleFirestoreError, OperationType } from './db-mock';
 import { Animal, Treatment, WeightRecord } from '../types';
 
 export const subscribeToAnimals = (userId: string, callback: (animals: Animal[]) => void) => {
+  if (!userId) return () => {};
   const q = query(collection(db, 'animals'), where('userId', '==', userId));
-  return onSnapshot(q, (snapshot) => {
-    const animals = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Animal));
+  return onSnapshot(q, (snapshot: any) => {
+    const animals = snapshot.docs.map((d: any) => ({ id: d.id, ...d.data() } as Animal));
     callback(animals);
-  }, (error) => {
+  }, (error: any) => {
     handleFirestoreError(error, OperationType.LIST, 'animals');
   });
 };

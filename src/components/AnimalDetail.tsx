@@ -2,7 +2,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { Animal, Treatment, WeightRecord } from '../types';
-import { db } from '../lib/firebase';
+import { db } from '../lib/db-mock';
 import { collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc } from '../lib/db-mock';
 import { subscribeToTreatments, subscribeToWeights, addTreatment, addWeightRecord, updateAnimal } from '../lib/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -303,7 +303,7 @@ export default function AnimalDetail({ user }: DetailProps) {
                      <span className="flex items-center gap-1"><div className="w-3 h-3 bg-[#141414] animate-pulse"></div> Storico</span>
                      <span className="flex items-center gap-1"><div className="w-3 h-px border-b-2 border-dashed border-[#141414]"></div> Proiezione (3 mesi)</span>
                   </div>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                     <LineChart data={chartData} margin={{ top: 15, right: 20, bottom: 5, left: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#D8D7D3" vertical={false} />
                       <XAxis dataKey="date" stroke="#141414" fontSize={10} tickLine={false} axisLine={true} tickMargin={10} />
@@ -324,7 +324,7 @@ export default function AnimalDetail({ user }: DetailProps) {
             {/* Simple Tree Visualization */}
             <div className="flex flex-col items-center">
               {/* Parents Row */}
-              <div className="flex justify-center gap-8 md:gap-16 mb-12 relative w-full">
+              <div className="flex justify-center gap-4 md:gap-16 mb-12 relative w-full">
                 <div className="text-center flex-1 max-w-[200px]">
                   <h3 className="text-[10px] font-bold text-[#141414] uppercase tracking-widest mb-3 opacity-70">Madre</h3>
                   {mother ? (
@@ -350,8 +350,8 @@ export default function AnimalDetail({ user }: DetailProps) {
               <div className="relative mb-12 pt-8 border-t border-[#141414] w-1/2 flex justify-center">
                 <div className="absolute top-0 left-1/2 w-px h-8 bg-[#141414]"></div>
                 <div className="text-center z-10 w-full max-w-[240px]">
-                  <div className="block p-5 border border-[#141414] bg-[#141414] text-[#E4E3E0] shadow-[4px_4px_0px_0px_rgba(20,20,20,0.2)]">
-                     <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Target</p>
+                  <div className="block p-5 border border-red-600 bg-red-600 text-white shadow-[4px_4px_0px_0px_rgba(220,38,38,0.3)] rounded-sm">
+                     <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Target</p>
                      <p className="font-mono font-bold text-2xl tracking-tighter">{animal.earTag}</p>
                   </div>
                 </div>

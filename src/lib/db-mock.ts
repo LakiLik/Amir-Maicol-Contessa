@@ -1,142 +1,270 @@
-import { v4 as uuidv4 } from 'uuid';
+import { supabase } from './supabase';
 
-// Extremely basic localStorage-based mock for Firestore to avoid rewriting all UI code,
-// because creating 10+ Supabase relational tables automatically from frontend isn't possible.
-const STORAGE_KEY = 'agrosync_local_store';
+export const db = {};
 
-function getStore() {
-  const d = localStorage.getItem(STORAGE_KEY);
-  return d ? JSON.parse(d) : {};
-}
+export const collection = (db: any, ...paths: string[]) => paths.join('/');
 
-function saveStore(store: any) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
-  triggerCallbacks();
-}
+export const doc = (db: any, ...rest: string[]) => {
+  if (rest.length > 2) {
+    return { path: rest.slice(0, -1).join('/'), id: rest[rest.length - 1] };
+  } else if (rest.length === 2) {
+     return { path: rest[0], id: rest[1] };
+  } else if (rest.length === 1) {
+      const parts = rest[0].split('/');
+      return { path: parts.slice(0, -1).join('/'), id: parts[parts.length - 1] || '' };
+  } else if (rest.length === 0 && typeof db === 'string') {
+      return { path: db, id: crypto.randomUUID() };
+  }
+  return { path: '', id: '' };
+};
 
-const listeners: Set<Function> = new Set();
-function triggerCallbacks() {
-  listeners.forEach(cb => cb());
-}
+export const query = (col: string, ...filters: any[]) => {
+  return { col, filters };
+};
 
-export function collection(db: any, path: string, ...rest: string[]) {
-   return { path: [path, ...rest].join('/') };
-}
+export const where = (field: string, op: string, value: any) => {
+  return { field, op, value };
+};
 
-export function doc(dbOrCol: any, idOrPath?: string, id2?: string) {
-    if (typeof dbOrCol === 'string' || !dbOrCol) {
-        return { path: dbOrCol || idOrPath };
+export const getDocs = async (queryOrCol: any) => {
+  let table = '';
+  let filters: any[] = [];
+
+  if (typeof queryOrCol === 'string') {
+      table = queryOrCol;
+  } else if (queryOrCol && queryOrCol.col) {
+      table = queryOrCol.col;
+      filters = queryOrCol.filters || [];
+  } else {
+      console.warn("Invalid query object passed to getDocs:", queryOrCol);
+      return { docs: [], forEach: () => {} };
+  }
+
+  let builder: any;
+  const parts = table.split('/');
+  if (parts.length === 3) {
+      table = parts[2];
+      builder = supabase.from(table).select('*').eq('animalId', parts[1]);
+  } else {
+      builder = supabase.from(table).select('*');
+  }
+
+  for (const filter of filters) {
+    if (filter.op === '==') {
+      builder = builder.eq(filter.field, filter.value);
+    } else if (filter.op === 'in') {
+      builder = builder.in(filter.field, filter.value);
     }
-    if (idOrPath && id2) return { path: dbOrCol.path ? `${dbOrCol.path}/${idOrPath}/${id2}` : `${idOrPath}/${id2}` };
-    if (dbOrCol.path) {
-        if (idOrPath) return { path: `${dbOrCol.path}/${idOrPath}` };
-        return { path: `${dbOrCol.path}/${uuidv4()}` };
+  }
+  const { data, error } = await builder;
+  if (error) {
+     console.error("Supabase getDocs error:", error);
+     return { docs: [], forEach: () => {} };
+  }
+  return {
+    docs: (data || []).map((d: any) => ({
+      id: d.id,
+      data: () => d
+    })),
+    forEach: (cb: any) => {
+      (data || []).forEach((d: any) => cb({ id: d.id, data: () => d }));
     }
-    return { path: idOrPath || uuidv4() };
-}
+  };
+};
 
-export function query(col: any, ...constraints: any[]) {
-   return { path: col.path, constraints };
-}
+export const getDoc = async (d: any) => {
+  if (!d || !d.path) {
+    console.warn("Invalid document reference passed to getDoc:", d);
+    return { id: d?.id, exists: () => false, data: () => null };
+  }
+  let table = d.path;
+  const parts = table.split('/');
+  if (parts.length === 3) {
+      table = parts[2];
+  }
+  const { data, error } = await supabase.from(table).select('*').eq('id', d.id).single();
+  if (error) {
+     console.error("Supabase getDoc error:", error);
+     return { id: d.id, exists: () => false, data: () => null };
+  }
+  return {
+    id: d.id,
+    exists: () => !!data,
+    data: () => data
+  };
+};
 
-export function where(field: string, op: string, value: any) {
-   return { field, op, value };
-}
+export const onSnapshot = (ref: any, cb: any, onError?: any) => {
+  const isDoc = ref && typeof ref === 'object' && ref.path && !ref.col;
+  let table = '';
+  
+  if (isDoc) {
+      table = ref.path;
+  } else if (typeof ref === 'string') {
+      table = ref;
+  } else if (ref && ref.col) {
+      table = ref.col;
+  } else {
+      console.warn("Invalid ref passed to onSnapshot:", ref);
+      return () => {};
+  }
 
-export async function getDocs(q: any) {
-   const store = getStore();
-   const allDocs = store[q.path] || {};
-   let results = Object.keys(allDocs).map(id => ({ id, data: () => allDocs[id], ...allDocs[id] }));
-   
-   if (q.constraints) {
-      q.constraints.forEach((c: any) => {
-         if (c.op === '==') {
-            results = results.filter((d: any) => d.data()[c.field] === c.value);
-         }
-      });
-   }
-   
-   return { docs: results, forEach: (cb: any) => results.forEach(cb) };
-}
+  const parts = table.split('/');
+  if (parts.length === 3) {
+      table = parts[2];
+  }
 
-export async function getDoc(dRef: any) {
-   const pathParts = dRef.path.split('/');
-   const id = pathParts.pop();
-   const col = pathParts.join('/');
-   const store = getStore();
-   const data = (store[col] || {})[id];
-   return {
-       id,
-       exists: () => !!data,
-       data: () => data
-   };
-}
-
-export async function setDoc(dRef: any, data: any) {
-   const pathParts = dRef.path.split('/');
-   const id = pathParts.pop();
-   const col = pathParts.join('/');
-   const store = getStore();
-   if (!store[col]) store[col] = {};
-   store[col][id!] = data;
-   saveStore(store);
-}
-
-export async function addDoc(colRef: any, data: any) {
-   const id = uuidv4();
-   const store = getStore();
-   if (!store[colRef.path]) store[colRef.path] = {};
-   store[colRef.path][id] = data;
-   saveStore(store);
-   return { id };
-}
-
-export async function updateDoc(dRef: any, data: any) {
-   const pathParts = dRef.path.split('/');
-   const id = pathParts.pop();
-   const col = pathParts.join('/');
-   const store = getStore();
-   if (!store[col]) store[col] = {};
-   
-   let existing = store[col][id!] || {};
-   // handle increments broadly
-   let updated = { ...data };
-   Object.keys(updated).forEach(k => {
-       if (updated[k] && updated[k]._isIncrement) {
-           updated[k] = (existing[k] || 0) + updated[k].val;
+  const channelName = 'public:' + table + ':' + Math.random().toString(36).substring(7);
+  const channel = supabase
+    .channel(channelName)
+    .on('postgres_changes', { event: '*', schema: 'public', table: table }, payload => {
+       if (isDoc) {
+           getDoc(ref).then(cb).catch(err => { if (onError) onError(err); });
+       } else {
+           getDocs(ref).then(cb).catch(err => { if (onError) onError(err); });
        }
-   });
-   
-   store[col][id!] = { ...existing, ...updated };
-   saveStore(store);
+    })
+    .subscribe();
+  
+  if (isDoc) {
+     getDoc(ref).then(cb).catch(err => { if (onError) onError(err); });
+  } else {
+     getDocs(ref).then(cb).catch(err => { if (onError) onError(err); });
+  }
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+};
+
+const cleanPayload = (obj: any) => {
+  const cleaned: any = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined) {
+      cleaned[k] = v;
+    }
+  }
+  return cleaned;
+};
+
+export const addDoc = async (col: string, data: any) => {
+  let table = col;
+  const parts = table.split('/');
+  let payload = cleanPayload({ ...data });
+  if (parts.length === 3) {
+      table = parts[2];
+      payload.animalId = parts[1];
+  }
+
+  const attemptInsert = async (currentPayload: any): Promise<any> => {
+    const { data: res, error } = await supabase.from(table).insert([currentPayload]).select();
+    if (error) {
+       if (error.code === 'PGRST204' || error.code === 'PGRST205') {
+          const match = error.message?.match(/Could not find the '([^']+)' column/);
+          if (match && match[1]) {
+             const colName = match[1];
+             console.warn(`[Auto-Fix] Column '${colName}' not found in '${table}'. Removing from payload and retrying. Please update your Supabase schema!`);
+             const nextPayload = { ...currentPayload };
+             delete nextPayload[colName];
+             return attemptInsert(nextPayload);
+          }
+       }
+       console.error(`Supabase addDoc error on table ${table}:`, error);
+       throw error;
+    }
+    return { id: res[0].id };
+  };
+
+  return attemptInsert(payload);
+};
+
+export const setDoc = async (d: any, data: any) => {
+  let table = d.path;
+  const parts = table.split('/');
+  let payload = cleanPayload({ ...data });
+  if (parts.length === 3) {
+      table = parts[2];
+      payload.animalId = parts[1];
+  }
+
+  const attemptUpsert = async (currentPayload: any): Promise<void> => {
+    const { error: upsertErr } = await supabase.from(table).upsert({ ...currentPayload, id: d.id });
+    if (upsertErr) {
+       if (upsertErr.code === 'PGRST204' || upsertErr.code === 'PGRST205') {
+          const match = upsertErr.message?.match(/Could not find the '([^']+)' column/);
+          if (match && match[1]) {
+             const colName = match[1];
+             console.warn(`[Auto-Fix] Column '${colName}' not found in '${table}'. Removing from payload and retrying upsert. Please update your Supabase schema!`);
+             const nextPayload = { ...currentPayload };
+             delete nextPayload[colName];
+             return attemptUpsert(nextPayload);
+          }
+       }
+       console.error("Supabase setDoc (upsert) error:", upsertErr);
+       throw upsertErr;
+    }
+  };
+
+  return attemptUpsert(payload);
+};
+
+export const updateDoc = async (d: any, data: any) => {
+  let finalData = cleanPayload({ ...data });
+  let table = d.path;
+  const parts = table.split('/');
+  if (parts.length === 3) {
+      table = parts[2];
+  }
+  
+  const attemptUpdate = async (currentPayload: any): Promise<void> => {
+    const { error } = await supabase.from(table).update(currentPayload).eq('id', d.id);
+    if (error) {
+       if (error.code === 'PGRST204' || error.code === 'PGRST205') {
+          const match = error.message?.match(/Could not find the '([^']+)' column/);
+          if (match && match[1]) {
+             const colName = match[1];
+             console.warn(`[Auto-Fix] Column '${colName}' not found in '${table}'. Removing from payload and retrying update. Please update your Supabase schema!`);
+             const nextPayload = { ...currentPayload };
+             delete nextPayload[colName];
+             return attemptUpdate(nextPayload);
+          }
+       }
+       console.error("Supabase updateDoc error:", error);
+       throw error;
+    }
+  };
+
+  return attemptUpdate(finalData);
+};
+
+export const deleteDoc = async (d: any) => {
+  let table = d.path;
+  const parts = table.split('/');
+  if (parts.length === 3) {
+      table = parts[2];
+  }
+  const { error } = await supabase.from(table).delete().eq('id', d.id);
+  if (error) {
+     console.error("Supabase deleteDoc error:", error);
+     throw error;
+  }
+};
+
+export const increment = (amount: number) => {
+  // Mock as a flat amount for simplified API wrapping (would need dynamic property updates/rpc ideally in supabase)
+  return amount;
+};
+
+export const serverTimestamp = () => new Date().toISOString();
+
+export enum OperationType {
+  READ = 'read',
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
 }
 
-export async function deleteDoc(dRef: any) {
-   const pathParts = dRef.path.split('/');
-   const id = pathParts.pop();
-   const col = pathParts.join('/');
-   const store = getStore();
-   if (store[col] && store[col][id!]) {
-       delete store[col][id!];
-       saveStore(store);
-   }
-}
-
-export function onSnapshot(q: any, cb: Function, errCb?: Function) {
-   const fetchAndTrigger = () => {
-       getDocs(q).then((res) => cb(res)).catch(e => errCb && errCb(e));
-   };
-   fetchAndTrigger();
-   listeners.add(fetchAndTrigger);
-   return () => {
-       listeners.delete(fetchAndTrigger);
-   };
-}
-
-export function increment(val: number) {
-    return { _isIncrement: true, val };
-}
-
-export function serverTimestamp() {
-    return Date.now();
-}
+export const handleFirestoreError = (error: any, op: string, path: string) => {
+  console.error(`DB Error [${op}] at ${path}:`, error);
+};

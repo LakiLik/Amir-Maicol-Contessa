@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { collection, query, where, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from '../lib/db-mock';
-import { db } from '../lib/firebase';
+import { db } from '../lib/db-mock';
 import { Animal, Geozone, CustomAlert } from '../types';
 import { APIProvider, Map, AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
 import { MapPin, Map as MapIcon, ShieldAlert, Plus, Trash2 } from 'lucide-react';
@@ -160,9 +160,9 @@ export default function MapArea({ user }: MapAreaProps) {
            >
               Simula GPS GPS
            </button>
-           <button 
+           <button type="button"
               onClick={() => setMode(mode === 'view' ? 'draw_circle' : 'view')}
-              className={`text-xs border border-[#141414] px-4 py-3 font-bold uppercase tracking-widest transition-colors flex items-center gap-2 shadow-[2px_2px_0px_0px_#141414] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none ${mode === 'draw_circle' ? 'bg-[#141414] text-[#E4E3E0]' : 'bg-white hover:bg-[#E4E3E0]'}`}
+              className={`text-xs border border-[#141414] px-4 py-3 font-bold uppercase tracking-widest transition-colors flex items-center gap-2 shadow-[2px_2px_0px_0px_#141414] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none cursor-pointer ${mode === 'draw_circle' ? 'bg-[#141414] text-[#E4E3E0]' : 'bg-white hover:bg-[#E4E3E0]'}`}
            >
               <Plus size={14} />
               {mode === 'draw_circle' ? 'Annulla Inserimento' : 'Nuova Geo-Zona'}

@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { collection, query, where, onSnapshot, addDoc } from '../lib/db-mock';
-import { db } from '../lib/firebase';
+import { db } from '../lib/db-mock';
 import { Animal, MilkRecord } from '../types';
 import { Plus, X, BarChart3, TrendingUp, Trophy } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
@@ -72,7 +72,7 @@ export default function MilkTracking({ user }: { user: User }) {
           <h1 className="text-3xl font-bold tracking-tighter uppercase mb-2">Produzione Latte</h1>
           <p className="font-serif italic text-sm uppercase opacity-60">Statistiche e registri di mungitura</p>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="flex items-center text-xs border border-[#141414] bg-[#141414] text-[#E4E3E0] px-4 py-3 font-bold uppercase tracking-widest hover:bg-white hover:text-[#141414] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+        <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center text-xs border border-[#141414] bg-[#141414] text-[#E4E3E0] px-4 py-3 font-bold uppercase tracking-widest hover:bg-white hover:text-[#141414] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
           <Plus size={14} className="mr-2" /> Registra Mungitura
         </button>
       </div>
@@ -85,7 +85,7 @@ export default function MilkTracking({ user }: { user: User }) {
                   <div className="h-64 flex items-center justify-center text-xs font-mono opacity-50 uppercase tracking-widest border border-dashed border-[#141414]">Nessun dato temporale</div>
                ) : (
                   <div className="h-72 w-full font-mono text-xs">
-                     <ResponsiveContainer width="100%" height="100%">
+                     <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                         <BarChart data={chartData} margin={{ top: 10, right: 10, bottom: 5, left: -20 }}>
                            <CartesianGrid strokeDasharray="3 3" stroke="#D8D7D3" vertical={false} />
                            <XAxis dataKey="date" stroke="#141414" fontSize={10} tickLine={false} axisLine={true} tickMargin={10} />
