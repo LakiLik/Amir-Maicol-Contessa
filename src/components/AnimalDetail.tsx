@@ -7,6 +7,7 @@ import { collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc } fr
 import { subscribeToTreatments, subscribeToWeights, addTreatment, addWeightRecord, updateAnimal } from '../lib/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowLeft, Stethoscope, Scale, GitMerge, FileText, Image as ImageIcon, Camera, UploadCloud, X } from 'lucide-react';
+import FamilyTree from './FamilyTree';
 
 interface DetailProps {
   user: User;
@@ -303,7 +304,7 @@ export default function AnimalDetail({ user }: DetailProps) {
                      <span className="flex items-center gap-1"><div className="w-3 h-3 bg-[#141414] animate-pulse"></div> Storico</span>
                      <span className="flex items-center gap-1"><div className="w-3 h-px border-b-2 border-dashed border-[#141414]"></div> Proiezione (3 mesi)</span>
                   </div>
-                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                  <ResponsiveContainer width="100%" height={250}>
                     <LineChart data={chartData} margin={{ top: 15, right: 20, bottom: 5, left: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#D8D7D3" vertical={false} />
                       <XAxis dataKey="date" stroke="#141414" fontSize={10} tickLine={false} axisLine={true} tickMargin={10} />
@@ -320,62 +321,7 @@ export default function AnimalDetail({ user }: DetailProps) {
         )}
 
         {activeTab === 'family' && (
-          <div className="bg-white border border-[#141414] p-8 shadow-[4px_4px_0px_0px_#141414]">
-            {/* Simple Tree Visualization */}
-            <div className="flex flex-col items-center">
-              {/* Parents Row */}
-              <div className="flex justify-center gap-4 md:gap-16 mb-12 relative w-full">
-                <div className="text-center flex-1 max-w-[200px]">
-                  <h3 className="text-[10px] font-bold text-[#141414] uppercase tracking-widest mb-3 opacity-70">Madre</h3>
-                  {mother ? (
-                    <Link to={`/animal/${mother.id}`} className="block p-4 border border-[#141414] bg-[#E4E3E0]/30 hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] hover:shadow-none group">
-                      <p className="font-mono font-bold text-lg">{mother.earTag}</p>
-                      <p className="text-[10px] uppercase font-serif italic opacity-70 mt-1">{mother.name || '-'}</p>
-                    </Link>
-                  ) : <div className="block p-4 border border-[#141414] border-dashed bg-transparent text-[#141414]/40 font-mono text-sm uppercase tracking-widest">Ignota</div>}
-                </div>
-                
-                <div className="text-center flex-1 max-w-[200px]">
-                  <h3 className="text-[10px] font-bold text-[#141414] uppercase tracking-widest mb-3 opacity-70">Padre</h3>
-                  {father ? (
-                    <Link to={`/animal/${father.id}`} className="block p-4 border border-[#141414] bg-[#E4E3E0]/30 hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] hover:shadow-none group">
-                      <p className="font-mono font-bold text-lg">{father.earTag}</p>
-                      <p className="text-[10px] uppercase font-serif italic opacity-70 mt-1">{father.name || '-'}</p>
-                    </Link>
-                  ) : <div className="block p-4 border border-[#141414] border-dashed bg-transparent text-[#141414]/40 font-mono text-sm uppercase tracking-widest">Ignoto</div>}
-                </div>
-              </div>
-
-              {/* Current Animal */}
-              <div className="relative mb-12 pt-8 border-t border-[#141414] w-1/2 flex justify-center">
-                <div className="absolute top-0 left-1/2 w-px h-8 bg-[#141414]"></div>
-                <div className="text-center z-10 w-full max-w-[240px]">
-                  <div className="block p-5 border border-red-600 bg-red-600 text-white shadow-[4px_4px_0px_0px_rgba(220,38,38,0.3)] rounded-sm">
-                     <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Target</p>
-                     <p className="font-mono font-bold text-2xl tracking-tighter">{animal.earTag}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Children */}
-              {children.length > 0 && (
-                <div className="relative pt-12 border-t border-[#141414] w-3/4 flex justify-center">
-                  <div className="absolute top-0 left-1/2 w-px h-12 bg-[#141414]"></div>
-                  <div className="w-full text-center">
-                    <h3 className="text-[10px] font-bold text-[#141414] uppercase tracking-widest mb-8 absolute -top-10 left-1/2 -ml-6 bg-white px-3 py-1 border border-[#141414]">Generazione F1</h3>
-                    <div className="flex flex-wrap justify-center gap-6">
-                       {children.map(child => (
-                           <Link key={child.id} to={`/animal/${child.id}`} className="block min-w-[140px] p-4 border border-[#141414] bg-white hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] hover:shadow-none group">
-                             <p className="font-mono font-bold text-lg">{child.earTag}</p>
-                             <p className="text-[10px] uppercase font-serif italic opacity-70 mt-1">{child.name || '-'}</p>
-                           </Link>
-                       ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          <FamilyTree currentAnimalId={animal.id} userId={user.id} />
         )}
         {activeTab === 'photos' && (
           <div className="space-y-4">

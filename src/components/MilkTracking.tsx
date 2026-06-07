@@ -85,7 +85,7 @@ export default function MilkTracking({ user }: { user: User }) {
                   <div className="h-64 flex items-center justify-center text-xs font-mono opacity-50 uppercase tracking-widest border border-dashed border-[#141414]">Nessun dato temporale</div>
                ) : (
                   <div className="h-72 w-full font-mono text-xs">
-                     <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                     <ResponsiveContainer width="100%" height={250}>
                         <BarChart data={chartData} margin={{ top: 10, right: 10, bottom: 5, left: -20 }}>
                            <CartesianGrid strokeDasharray="3 3" stroke="#D8D7D3" vertical={false} />
                            <XAxis dataKey="date" stroke="#141414" fontSize={10} tickLine={false} axisLine={true} tickMargin={10} />

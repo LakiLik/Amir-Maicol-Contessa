@@ -243,7 +243,7 @@ export default function Dashboard({ user }: DashboardProps) {
                   <div className="h-64 flex items-center justify-center text-xs font-mono opacity-50 uppercase tracking-widest border border-dashed border-[#141414]">Dati insufficienti</div>
                ) : (
                   <div className="h-72 w-full font-mono text-xs">
-                     <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                     <ResponsiveContainer width="100%" height={250}>
                         <AreaChart data={weightData} margin={{ top: 10, right: 10, bottom: 5, left: -20 }}>
                            <defs>
                               <linearGradient id="colorMedia" x1="0" y1="0" x2="0" y2="1">
@@ -272,7 +272,7 @@ export default function Dashboard({ user }: DashboardProps) {
                      <div className="py-10 text-center text-xs font-mono opacity-50">Nessun dato.</div>
                   ) : (
                      <div className="h-48 w-full font-mono text-xs">
-                        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                        <ResponsiveContainer width="100%" height={180}>
                            <PieChart>
                               <Pie data={healthData} cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={2} dataKey="value" stroke="none">
                                  {healthData.map((entry, index) => (

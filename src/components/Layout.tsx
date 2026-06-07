@@ -57,7 +57,7 @@ export default function Layout({ user }: LayoutProps) {
   ];
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#E4E3E0] text-[#141414] font-sans border-0 md:border-[12px] border-[#141414]">
+    <div className="flex h-[100dvh] overflow-hidden bg-[#E4E3E0] text-[#141414] font-sans border-0 md:border-[12px] border-[#141414]">
       {/* Mobile menu button */}
       <div className="md:hidden fixed top-0 w-full z-50 bg-[#E4E3E0] border-b border-[#141414] px-4 h-16 flex items-center justify-between">
         <span className="text-xl font-bold tracking-tighter uppercase">AgroSync <span className="font-normal italic font-serif opacity-70">Pro</span></span>
@@ -135,7 +135,7 @@ export default function Layout({ user }: LayoutProps) {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto flex flex-col">
+      <main className="flex-1 overflow-y-auto flex flex-col pt-16 md:pt-0">
         {/* Top Status Bar desktop */}
         <header className="hidden md:flex items-center justify-end px-6 py-4 border-b border-[#141414]">
            <button type="button" onClick={() => window.location.reload()} className="flex items-center gap-2 px-3 py-1 mr-4 border border-[#141414] bg-white font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] shadow-[2px_2px_0px_0px_#141414] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
