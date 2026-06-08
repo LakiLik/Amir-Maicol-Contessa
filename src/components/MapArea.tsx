@@ -200,7 +200,7 @@ export default function MapArea({ user }: MapAreaProps) {
                <Map
                   defaultCenter={{ lat: 41.9028, lng: 12.4964 }} // Rome defaults
                   defaultZoom={15}
-                  mapId="CATTLE_TRACKER_MAP"
+                  mapId="MOOSHION_MAP"
                   internalUsageAttributionIds={['gmp_mcp_codeassist_v1_aistudio']}
                   className="w-full h-full"
                   onClick={(e) => {

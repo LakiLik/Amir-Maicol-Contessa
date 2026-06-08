@@ -1,15 +1,24 @@
 export interface Animal {
   id: string; // Document ID
   earTag: string;
-  name?: string;
   species: string;
-  gender?: string;
-  dateOfBirth: string;
+  
+  name?: string;
   breed?: string;
-  healthStatus: string;
+  gender?: string;
+  dateOfBirth?: string;
+  entryDate?: string;
+  origin?: string;
+  exitDate?: string;
+  destination?: string;
+  mod4?: string;
   motherId?: string;
   fatherId?: string;
   photoUrl?: string;
+  documentUrl?: string;
+
+  // Additional existing fields that we can keep optional
+  healthStatus?: string;
   userId: string;
   currentWeight?: number;
   lastLocation?: { lat: number; lng: number };

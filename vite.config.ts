@@ -17,8 +17,8 @@ export default defineConfig(() => {
         registerType: 'autoUpdate',
         manifestFilename: 'manifest.json',
         manifest: {
-          short_name: 'CattleTracker',
-          name: 'Cattle Tracker Admin Beta',
+          short_name: 'MOOSHion',
+          name: 'MOOSHion Admin',
           icons: [
             {
               src: '/icon-512x512.png',

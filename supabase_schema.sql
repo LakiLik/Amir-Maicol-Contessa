@@ -1,4 +1,4 @@
--- Schema creation for Cattle Tracker on Supabase
+-- Schema creation for MOOSHion on Supabase
 
 -- Note: Se stai riscontrando errori "new row violates row-level security policy",
 -- significa che Supabase ha abilitato la "Row Level Security" (RLS) di default

@@ -23,17 +23,34 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAnimal, setEditingAnimal] = useState<Animal | null>(null);
 
-  // PDF Config Modal
-  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
-  const [pdfConfig, setPdfConfig] = useState({
+  // Export Config Modal
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'pdf'|'xlsx'|'csv'>('pdf');
+  const [exportConfig, setExportConfig] = useState({
      earTag: true,
      name: true,
      species: true,
      breed: true,
+     gender: true,
      dateOfBirth: true,
+     entryDate: true,
+     origin: true,
+     exitDate: true,
+     destination: true,
+     mod4: true,
      healthStatus: true,
-     gender: false
+     motherId: false,
+     fatherId: false,
+     documentUrl: false,
   });
+
+  const checkAllExport = (val: boolean) => {
+     setExportConfig({
+       earTag: val, name: val, species: val, breed: val, gender: val,
+       dateOfBirth: val, entryDate: val, origin: val, exitDate: val,
+       destination: val, mod4: val, healthStatus: val, motherId: val, fatherId: val, documentUrl: val
+     });
+  };
 
   // Scanner state
   const [isScanning, setIsScanning] = useState(false);
@@ -54,35 +71,74 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
     (a.name && a.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const exportCSV = () => {
-    const headers = ['Orecchino', 'Nome', 'Specie', 'Razza', 'Data di Nascita', 'Stato Salute', 'Peso (kg)'];
-    const rows = filteredAnimals.map(a => [
-      a.earTag, a.name || '', a.species, a.breed || '', a.dateOfBirth, a.healthStatus, a.currentWeight || ''
-    ]);
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "bestiame.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const executeExport = () => {
+    const headers: string[] = [];
+    if (exportConfig.earTag) headers.push('Orecchino');
+    if (exportConfig.name) headers.push('Nome');
+    if (exportConfig.species) headers.push('Specie');
+    if (exportConfig.breed) headers.push('Razza');
+    if (exportConfig.gender) headers.push('Sesso');
+    if (exportConfig.dateOfBirth) headers.push('Data Nascita');
+    if (exportConfig.entryDate) headers.push('Data Ingresso');
+    if (exportConfig.origin) headers.push('Provenienza');
+    if (exportConfig.exitDate) headers.push('Data Uscita');
+    if (exportConfig.destination) headers.push('Destinazione');
+    if (exportConfig.mod4) headers.push('Mod 4');
+    if (exportConfig.healthStatus) headers.push('Salute');
+    if (exportConfig.motherId) headers.push('Madre');
+    if (exportConfig.fatherId) headers.push('Padre');
+    if (exportConfig.documentUrl) headers.push('Documenti');
 
-  const exportXLSX = () => {
-    const ws = xlsx.utils.json_to_sheet(filteredAnimals.map(a => ({
-        Orecchino: a.earTag,
-        Nome: a.name || '',
-        Specie: a.species,
-        Razza: a.breed || '',
-        DataNascita: a.dateOfBirth,
-        Salute: a.healthStatus || '',
-        Sesso: a.gender || '',
-        Peso: a.currentWeight || ''
-    })));
-    const wb = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, ws, "Animali");
-    xlsx.writeFile(wb, "bestiame.xlsx");
+    const rows = filteredAnimals.map(a => {
+      const row: any = {};
+      if (exportConfig.earTag) row['Orecchino'] = a.earTag;
+      if (exportConfig.name) row['Nome'] = a.name || '';
+      if (exportConfig.species) row['Specie'] = a.species;
+      if (exportConfig.breed) row['Razza'] = a.breed || '';
+      if (exportConfig.gender) row['Sesso'] = a.gender || '';
+      if (exportConfig.dateOfBirth) row['Data Nascita'] = a.dateOfBirth || '';
+      if (exportConfig.entryDate) row['Data Ingresso'] = a.entryDate || '';
+      if (exportConfig.origin) row['Provenienza'] = a.origin || '';
+      if (exportConfig.exitDate) row['Data Uscita'] = a.exitDate || '';
+      if (exportConfig.destination) row['Destinazione'] = a.destination || '';
+      if (exportConfig.mod4) row['Mod 4'] = a.mod4 || '';
+      if (exportConfig.healthStatus) row['Salute'] = a.healthStatus || '';
+      if (exportConfig.motherId) row['Madre'] = a.motherId || '';
+      if (exportConfig.fatherId) row['Padre'] = a.fatherId || '';
+      if (exportConfig.documentUrl) row['Documenti'] = a.documentUrl || '';
+      return row;
+    });
+
+    if (exportFormat === 'csv') {
+      const csvContent = "data:text/csv;charset=utf-8," + 
+        [headers.join(','), ...rows.map(r => headers.map(h => `"${String(r[h]).replace(/"/g, '""')}"`).join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "bestiame.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (exportFormat === 'xlsx') {
+      const ws = xlsx.utils.json_to_sheet(rows, { header: headers });
+      const wb = xlsx.utils.book_new();
+      xlsx.utils.book_append_sheet(wb, ws, "Animali");
+      xlsx.writeFile(wb, "bestiame.xlsx");
+    } else if (exportFormat === 'pdf') {
+      const doc = new jsPDF({ orientation: 'landscape' });
+      doc.text("Report Bestiame", 14, 15);
+      const pdfRows = rows.map(r => headers.map(h => String(r[h])));
+      autoTable(doc, {
+        startY: 20,
+        head: [headers],
+        body: pdfRows,
+        theme: 'grid',
+        styles: { fontSize: 8, font: 'helvetica' },
+        headStyles: { fillColor: [20, 20, 20], textColor: [255, 255, 255] }
+      });
+      doc.save("bestiame.pdf");
+    }
+    setIsExportModalOpen(false);
   };
 
   const handleImportXLSX = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -180,19 +236,32 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
   const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data = {
+    const data: any = {
       earTag: formData.get('earTag') as string,
       name: formData.get('name') as string,
       species: formData.get('species') as string,
       gender: formData.get('gender') as string,
       dateOfBirth: formData.get('dateOfBirth') as string,
       breed: formData.get('breed') as string,
-      healthStatus: formData.get('healthStatus') as string,
+      healthStatus: formData.get('healthStatus') as string || 'Sano',
       photoUrl: formData.get('photoUrl') as string,
       motherId: formData.get('motherId') as string || undefined,
       fatherId: formData.get('fatherId') as string || undefined,
+      entryDate: formData.get('entryDate') as string,
+      origin: formData.get('origin') as string,
+      exitDate: formData.get('exitDate') as string,
+      destination: formData.get('destination') as string,
+      mod4: formData.get('mod4') as string,
+      documentUrl: formData.get('documentUrl') as string,
       userId: user.id,
     };
+
+    // Clean up empty fields
+    Object.keys(data).forEach(key => {
+      if (data[key] === '') {
+        delete data[key];
+      }
+    });
 
     if (editingAnimal) {
       await updateAnimal(editingAnimal.id, data, user.id);
@@ -219,13 +288,13 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
           <button onClick={() => fileInputRef.current?.click()} className="text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] flex items-center">
             <Upload size={14} className="mr-1" /> Import XLSX/CSV
           </button>
-          <button onClick={exportXLSX} className="text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+          <button onClick={() => { setExportFormat('xlsx'); setIsExportModalOpen(true); }} className="text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
             Exp XLSX
           </button>
-          <button onClick={exportCSV} className="text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+          <button onClick={() => { setExportFormat('csv'); setIsExportModalOpen(true); }} className="text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
             Exp CSV
           </button>
-          <button onClick={() => setIsPdfModalOpen(true)} className="text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+          <button onClick={() => { setExportFormat('pdf'); setIsExportModalOpen(true); }} className="text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
             Exp PDF
           </button>
           <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center text-xs border border-[var(--fg-color)] bg-[var(--fg-color)] text-[var(--bg-color)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--bg-color)] hover:text-[var(--fg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
@@ -349,57 +418,87 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                     </div>
                     <div className="col-span-2 sm:col-span-1">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Specie *</label>
-                      <select required name="species" defaultValue={editingAnimal?.species || 'mucca'} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
-                        <option value="mucca">Mucca</option>
-                        <option value="toro">Toro</option>
-                        <option value="vitello">Vitello/a</option>
-                        <option value="altro">Altro</option>
+                      <select required name="species" defaultValue={editingAnimal?.species || 'Bovino'} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
+                        <option value="Bovino">Bovino</option>
+                        <option value="Altro">Altro</option>
                       </select>
                     </div>
                     <div className="col-span-2 sm:col-span-1">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Sesso</label>
-                      <select name="gender" defaultValue={editingAnimal?.gender || 'F'} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
+                      <select name="gender" defaultValue={editingAnimal?.gender || ''} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
+                        <option value="">-- Seleziona --</option>
                         <option value="F">Femmina</option>
                         <option value="M">Maschio</option>
                       </select>
                     </div>
                     <div className="col-span-2 sm:col-span-1">
-                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Data di Nascita *</label>
-                      <input required type="date" name="dateOfBirth" defaultValue={editingAnimal?.dateOfBirth} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm font-mono uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Data di Nascita</label>
+                      <input type="date" name="dateOfBirth" defaultValue={editingAnimal?.dateOfBirth} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm font-mono uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                     </div>
                     <div className="col-span-2 sm:col-span-1">
-                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Stato Salute *</label>
-                      <select required name="healthStatus" defaultValue={editingAnimal?.healthStatus || 'Sano'} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Razza</label>
+                      <select name="breed" defaultValue={editingAnimal?.breed || ''} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
+                        <option value="">-- Seleziona --</option>
+                        <option value="Chianina">Chianina</option>
+                        <option value="Meticcio/Incrocio">Meticcio/Incrocio</option>
+                        <option value="Altro">Altro</option>
+                      </select>
+                    </div>
+
+                    <div className="col-span-2 sm:col-span-1">
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Data di Ingresso</label>
+                      <input type="date" name="entryDate" defaultValue={editingAnimal?.entryDate} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm font-mono uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
+                    </div>
+                    <div className="col-span-2 sm:col-span-1">
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Provenienza</label>
+                      <input type="text" name="origin" defaultValue={editingAnimal?.origin} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
+                    </div>
+                    <div className="col-span-2 sm:col-span-1">
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Data Uscita (Morte/Vendita)</label>
+                      <input type="date" name="exitDate" defaultValue={editingAnimal?.exitDate} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm font-mono uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
+                    </div>
+                    <div className="col-span-2 sm:col-span-1">
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Destinazione</label>
+                      <input type="text" name="destination" defaultValue={editingAnimal?.destination} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
+                    </div>
+                    <div className="col-span-2 sm:col-span-1">
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Mod 4</label>
+                      <input type="text" name="mod4" defaultValue={editingAnimal?.mod4} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
+                    </div>
+                    <div className="col-span-2 sm:col-span-1">
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Stato Salute</label>
+                      <select name="healthStatus" defaultValue={editingAnimal?.healthStatus || 'Sano'} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
                         <option value="Sano">Sano</option>
                         <option value="Malato">Malato</option>
                         <option value="In Osservazione">In Osservazione</option>
                       </select>
                     </div>
-                    <div className="col-span-2">
-                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Razza</label>
-                      <input type="text" name="breed" defaultValue={editingAnimal?.breed} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
-                    </div>
+
                     <div className="col-span-2 sm:col-span-1">
-                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Madre (Opzionale)</label>
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Madre</label>
                       <select name="motherId" defaultValue={editingAnimal?.motherId || ''} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
-                        <option value="">-- Seleziona --</option>
+                        <option value="">-- Nessuna --</option>
                         {animals.filter(a => a.gender === 'F' && a.id !== editingAnimal?.id).map(a => (
                           <option key={a.id} value={a.id}>{a.earTag} {a.name ? `(${a.name})` : ''}</option>
                         ))}
                       </select>
                     </div>
                     <div className="col-span-2 sm:col-span-1">
-                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Padre (Opzionale)</label>
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Padre</label>
                       <select name="fatherId" defaultValue={editingAnimal?.fatherId || ''} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
-                        <option value="">-- Seleziona --</option>
+                        <option value="">-- Nessuno --</option>
                         {animals.filter(a => a.gender === 'M' && a.id !== editingAnimal?.id).map(a => (
                           <option key={a.id} value={a.id}>{a.earTag} {a.name ? `(${a.name})` : ''}</option>
                         ))}
                       </select>
                     </div>
                     <div className="col-span-2">
-                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">URL Foto (CDN)</label>
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">URL Foto dell'animale</label>
                       <input type="url" name="photoUrl" defaultValue={editingAnimal?.photoUrl} placeholder="https://..." className="block w-full border border-[var(--fg-color)] bg-[var(--bg-color)]/30 py-2 px-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">URL Documenti (PDF/Word/Foto)</label>
+                      <input type="url" name="documentUrl" defaultValue={editingAnimal?.documentUrl} placeholder="https://..." className="block w-full border border-[var(--fg-color)] bg-[var(--bg-color)]/30 py-2 px-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                     </div>
                   </div>
                 </div>
@@ -417,36 +516,50 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
         </div>
       )}
 
-      {/* PDF Export Config Modal */}
-      {isPdfModalOpen && (
+      {/* Export Config Modal */}
+      {isExportModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center p-4 text-center">
-            <div className="fixed inset-0 transition-opacity bg-[var(--fg-color)]/50 backdrop-blur-sm" onClick={() => setIsPdfModalOpen(false)}></div>
-            <div className="relative inline-block align-bottom bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] text-left transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full p-8">
+            <div className="fixed inset-0 transition-opacity bg-[var(--fg-color)]/50 backdrop-blur-sm" onClick={() => setIsExportModalOpen(false)}></div>
+            <div className="relative inline-block align-bottom bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] text-left transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
                <h3 className="text-2xl font-bold tracking-tighter uppercase mb-2 flex items-center gap-2">
-                 <Settings2 className="w-6 h-6" /> Export PDF
+                 <Settings2 className="w-6 h-6" /> Export {exportFormat.toUpperCase()}
                </h3>
-               <p className="font-serif italic text-[11px] uppercase opacity-60 mb-6 border-b border-[var(--fg-color)] pb-4">Seleziona i campi da esportare</p>
+               <p className="font-serif italic text-[11px] uppercase opacity-60 mb-6 border-b border-[var(--fg-color)] pb-4 flex justify-between items-center">
+                 Seleziona i campi da esportare
+                 <div className="flex gap-2">
+                   <button onClick={() => checkAllExport(true)} className="text-[9px] underline">Tutti</button>
+                   <button onClick={() => checkAllExport(false)} className="text-[9px] underline">Nessuno</button>
+                 </div>
+               </p>
                
-               <div className="space-y-4 font-mono text-sm uppercase">
-                  {Object.entries(pdfConfig).map(([key, value]) => (
-                     <label key={key} className="flex items-center space-x-3 cursor-pointer group">
-                        <div className="relative flex items-center justify-center">
-                           <input type="checkbox" className="sr-only" checked={value} onChange={() => setPdfConfig(prev => ({ ...prev, [key]: !prev[key as keyof typeof pdfConfig] }))} />
-                           <div className={`w-5 h-5 flex items-center justify-center border transition-colors ${value ? 'bg-[var(--fg-color)] border-[var(--fg-color)]' : 'bg-transparent border-[var(--fg-color)] group-hover:bg-[var(--fg-color)]/10'}`}>
-                              {value && <div className="w-2.5 h-2.5 bg-[var(--bg-color)]"></div>}
-                           </div>
-                        </div>
-                        <span className="font-bold tracking-widest">{key === 'earTag' ? 'Orecchino' : key === 'dateOfBirth' ? 'Data Nascita' : key === 'healthStatus' ? 'Salute' : key}</span>
-                     </label>
-                  ))}
+               <div className="grid grid-cols-2 gap-4 font-mono text-sm uppercase">
+                  {Object.entries(exportConfig).map(([key, value]) => {
+                     const labels: any = {
+                        earTag: 'Orecchino', name: 'Nome', species: 'Specie', breed: 'Razza', gender: 'Sesso',
+                        dateOfBirth: 'Data Nascita', entryDate: 'Data Ingresso', origin: 'Provenienza',
+                        exitDate: 'Data Uscita', destination: 'Destinazione', mod4: 'Mod 4', healthStatus: 'Salute',
+                        motherId: 'Madre', fatherId: 'Padre', documentUrl: 'Documenti'
+                     };
+                     return (
+                      <label key={key} className="flex items-center space-x-3 cursor-pointer group">
+                          <div className="relative flex items-center justify-center shrink-0">
+                            <input type="checkbox" className="sr-only" checked={value} onChange={() => setExportConfig(prev => ({ ...prev, [key]: !prev[key as keyof typeof exportConfig] }))} />
+                            <div className={`w-5 h-5 flex items-center justify-center border transition-colors ${value ? 'bg-[var(--fg-color)] border-[var(--fg-color)]' : 'bg-transparent border-[var(--fg-color)] group-hover:bg-[var(--fg-color)]/10'}`}>
+                                {value && <div className="w-2.5 h-2.5 bg-[var(--bg-color)]"></div>}
+                            </div>
+                          </div>
+                          <span className="font-bold tracking-widest text-[10px] break-all truncate" title={labels[key]}>{labels[key]}</span>
+                      </label>
+                     );
+                  })}
                </div>
 
                <div className="mt-8 flex gap-3">
-                  <button onClick={exportPDF} className="flex-1 w-full inline-flex justify-center border border-transparent bg-[var(--fg-color)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] hover:bg-[var(--card-bg)] hover:border-[var(--fg-color)] hover:text-[var(--fg-color)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all">
-                     Genera Report
+                  <button onClick={executeExport} className="flex-1 w-full inline-flex justify-center border border-transparent bg-[var(--fg-color)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] hover:bg-[var(--card-bg)] hover:border-[var(--fg-color)] hover:text-[var(--fg-color)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all">
+                     Genera File
                   </button>
-                  <button onClick={() => setIsPdfModalOpen(false)} className="w-auto inline-flex justify-center border border-[var(--fg-color)] bg-[var(--card-bg)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--fg-color)] hover:bg-[var(--bg-color)] transition-colors">
+                  <button onClick={() => setIsExportModalOpen(false)} className="w-auto inline-flex justify-center border border-[var(--fg-color)] bg-[var(--card-bg)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--fg-color)] hover:bg-[var(--bg-color)] transition-colors">
                      Chiudi
                   </button>
                </div>

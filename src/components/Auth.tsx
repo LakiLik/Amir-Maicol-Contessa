@@ -31,11 +31,11 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--bg-color)] text-[var(--fg-color)] font-sans border-[12px] border-[var(--fg-color)]">
       <div className="max-w-md w-full bg-[var(--card-bg)] border-2 border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] p-8 space-y-8">
         <div className="text-center">
-          <div className="flex flex-col items-center justify-center mx-auto mb-6">
-            <img src="/logo.png" alt="" className="w-16 h-16 mb-4 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
+          <div className="flex flex-col items-center justify-center mx-auto mb-4">
+            <img src="/logo.png" alt="" className="w-16 h-16 mb-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
             <div className="flex flex-col items-center">
               <h1 className="text-4xl font-bold tracking-tighter uppercase leading-none text-center">MOOSH<span className="font-light opacity-60 lowercase">ion</span></h1>
-              <p className="mt-2 text-[10px] font-bold font-mono uppercase tracking-widest opacity-60 text-center">Beyond the farm</p>
+              <p className="mt-0 text-[10px] font-bold font-mono uppercase tracking-widest opacity-60 text-center">Beyond the farm</p>
             </div>
           </div>
         </div>

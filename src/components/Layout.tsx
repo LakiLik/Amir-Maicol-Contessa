@@ -104,16 +104,8 @@ export default function Layout({ user }: LayoutProps) {
         transform transition-transform duration-200 ease-in-out md:translate-x-0 md:relative md:w-64 flex flex-col space-y-8
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="hidden md:flex flex-col mb-2 mt-12 md:mt-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <img src="/logo.png" alt="" className="w-8 h-8 mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
-              <div className="flex flex-col items-start">
-                <h1 className="text-2xl font-bold tracking-tighter uppercase leading-none">MOOSH<span className="font-light opacity-60 lowercase">ion</span></h1>
-                <p className="mt-1 text-[9px] font-bold font-mono uppercase tracking-widest opacity-60">Beyond the farm</p>
-              </div>
-            </div>
-          </div>
+        <div className="md:hidden flex flex-col mb-2 mt-12 md:mt-0">
+          {/* Mobile menu padding equivalent */}
         </div>
 
         <nav className="flex-1 space-y-4">
@@ -169,21 +161,31 @@ export default function Layout({ user }: LayoutProps) {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto flex flex-col pt-16 md:pt-0">
         {/* Top Status Bar desktop */}
-        <header className="hidden md:flex items-center justify-end px-6 py-4 border-b border-[var(--fg-color)]">
-           <button onClick={toggleTheme} className="flex items-center justify-center p-2 mr-4 border border-[var(--fg-color)] bg-[var(--card-bg)] font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer" title="Cambia Tema">
-             {isDark ? <Moon size={16} /> : <Circle size={16} fill="currentColor" />}
-           </button>
-           <button type="button" onClick={() => window.location.reload()} className="flex items-center gap-2 px-3 py-1 mr-4 border border-[var(--fg-color)] bg-[var(--card-bg)] font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
-              <RefreshCw size={12} /> Aggiorna Dati
-           </button>
-           <div className={`flex items-center px-3 py-1 font-mono text-[10px] uppercase font-bold tracking-widest border border-[var(--fg-color)] mr-4 transition-colors ${isOnline ? 'bg-[var(--card-bg)] text-[var(--fg-color)]' : 'bg-red-100 text-red-900 border-red-900'}`}>
-              <span className={`w-2 h-2 rounded-full mr-2 ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
-              {isOnline ? 'ONLINE' : 'OFFLINE'}
-              {isOnline && <span className="border-l border-[var(--fg-color)]/30 ml-2 pl-2 opacity-70">SYNC: {lastSync}</span>}
-            </div>
-            <div className="text-[10px] font-mono uppercase tracking-widest font-bold">
-               {new Date().toLocaleDateString()}
-            </div>
+        <header className="hidden md:flex items-center justify-between px-6 py-4 border-b border-[var(--fg-color)]">
+           <div className="flex items-center">
+             <img src="/logo.png" alt="" className="w-8 h-8 mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
+             <div className="flex flex-col items-start mt-1">
+               <span className="text-xl font-bold tracking-tighter uppercase leading-none">MOOSH<span className="font-light opacity-60 lowercase">ion</span></span>
+               <span className="text-[8px] font-bold font-mono uppercase tracking-widest opacity-60 mt-[2px]">Beyond the farm</span>
+             </div>
+           </div>
+           
+           <div className="flex items-center justify-end">
+             <button onClick={toggleTheme} className="flex items-center justify-center p-2 mr-4 border border-[var(--fg-color)] bg-[var(--card-bg)] font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer" title="Cambia Tema">
+               {isDark ? <Moon size={16} /> : <Circle size={16} fill="currentColor" />}
+             </button>
+             <button type="button" onClick={() => window.location.reload()} className="flex items-center gap-2 px-3 py-1 mr-4 border border-[var(--fg-color)] bg-[var(--card-bg)] font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
+                <RefreshCw size={12} /> Aggiorna Dati
+             </button>
+             <div className={`flex items-center px-3 py-1 font-mono text-[10px] uppercase font-bold tracking-widest border border-[var(--fg-color)] mr-4 transition-colors ${isOnline ? 'bg-[var(--card-bg)] text-[var(--fg-color)]' : 'bg-red-100 text-red-900 border-red-900'}`}>
+                <span className={`w-2 h-2 rounded-full mr-2 ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
+                {isOnline ? 'ONLINE' : 'OFFLINE'}
+                {isOnline && <span className="border-l border-[var(--fg-color)]/30 ml-2 pl-2 opacity-70">SYNC: {lastSync}</span>}
+              </div>
+              <div className="text-[10px] font-mono uppercase tracking-widest font-bold">
+                 {new Date().toLocaleDateString()}
+              </div>
+           </div>
         </header>
 
         <div className="flex-1 p-4 md:p-6 overflow-y-auto">
