@@ -15,6 +15,7 @@ export interface Animal {
   motherId?: string;
   fatherId?: string;
   photoUrl?: string;
+  photoUrls?: string[];
   documentUrl?: string;
 
   // Additional existing fields that we can keep optional

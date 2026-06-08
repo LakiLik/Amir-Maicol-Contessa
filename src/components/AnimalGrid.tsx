@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent, useRef, ChangeEvent } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { Animal } from '../types';
-import { subscribeToAnimals, addAnimal, deleteAnimal, updateAnimal } from '../lib/api';
+import { subscribeToAnimals, addAnimal, deleteAnimal, updateAnimal, getTreatmentsForAnimal, getWeightsForAnimal } from '../lib/api';
 import { Link } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -22,10 +22,35 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAnimal, setEditingAnimal] = useState<Animal | null>(null);
+  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
+  
+  const handlePhotoUpload = (e: ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (!files) return;
+      Array.from(files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+              if (evt.target?.result) {
+                 setUploadedPhotos(prev => [...prev, evt.target!.result as string]);
+              }
+          };
+          reader.readAsDataURL(file as Blob);
+      });
+  };
+
+  const removePhoto = (index: number) => {
+    setUploadedPhotos(prev => prev.filter((_, i) => i !== index));
+  };
 
   // Export Config Modal
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportFormat, setExportFormat] = useState<'pdf'|'xlsx'|'csv'>('pdf');
+  const [exportProgress, setExportProgress] = useState('');
+  const [exportFilters, setExportFilters] = useState({
+     dateRange: { start: '', end: '' },
+     breed: '',
+     healthStatus: ''
+  });
   const [exportConfig, setExportConfig] = useState({
      earTag: true,
      name: true,
@@ -42,13 +67,18 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
      motherId: false,
      fatherId: false,
      documentUrl: false,
+     treatments: true,
+     weights: true,
+     offspring: true,
+     photos: false,
   });
 
   const checkAllExport = (val: boolean) => {
      setExportConfig({
        earTag: val, name: val, species: val, breed: val, gender: val,
        dateOfBirth: val, entryDate: val, origin: val, exitDate: val,
-       destination: val, mod4: val, healthStatus: val, motherId: val, fatherId: val, documentUrl: val
+       destination: val, mod4: val, healthStatus: val, motherId: val, fatherId: val, documentUrl: val,
+       treatments: val, weights: val, offspring: val, photos: val
      });
   };
 
@@ -71,74 +101,132 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
     (a.name && a.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const executeExport = () => {
-    const headers: string[] = [];
-    if (exportConfig.earTag) headers.push('Orecchino');
-    if (exportConfig.name) headers.push('Nome');
-    if (exportConfig.species) headers.push('Specie');
-    if (exportConfig.breed) headers.push('Razza');
-    if (exportConfig.gender) headers.push('Sesso');
-    if (exportConfig.dateOfBirth) headers.push('Data Nascita');
-    if (exportConfig.entryDate) headers.push('Data Ingresso');
-    if (exportConfig.origin) headers.push('Provenienza');
-    if (exportConfig.exitDate) headers.push('Data Uscita');
-    if (exportConfig.destination) headers.push('Destinazione');
-    if (exportConfig.mod4) headers.push('Mod 4');
-    if (exportConfig.healthStatus) headers.push('Salute');
-    if (exportConfig.motherId) headers.push('Madre');
-    if (exportConfig.fatherId) headers.push('Padre');
-    if (exportConfig.documentUrl) headers.push('Documenti');
+  const executeExport = async () => {
+    setExportProgress('Generazione in corso...');
+    try {
+      const headers: string[] = [];
+      if (exportConfig.earTag) headers.push('Orecchino');
+      if (exportConfig.name) headers.push('Nome');
+      if (exportConfig.species) headers.push('Specie');
+      if (exportConfig.breed) headers.push('Razza');
+      if (exportConfig.gender) headers.push('Sesso');
+      if (exportConfig.dateOfBirth) headers.push('Data Nascita');
+      if (exportConfig.entryDate) headers.push('Data Ingresso');
+      if (exportConfig.origin) headers.push('Provenienza');
+      if (exportConfig.exitDate) headers.push('Data Uscita');
+      if (exportConfig.destination) headers.push('Destinazione');
+      if (exportConfig.mod4) headers.push('Mod 4');
+      if (exportConfig.healthStatus) headers.push('Salute');
+      if (exportConfig.motherId) headers.push('Madre');
+      if (exportConfig.fatherId) headers.push('Padre');
+      if (exportConfig.documentUrl) headers.push('Documenti');
+      if (exportConfig.treatments) headers.push('Trattamenti (Storico)');
+      if (exportConfig.weights) headers.push('Pesi (Storico)');
+      if (exportConfig.offspring) headers.push('Prole');
+      if (exportConfig.photos) headers.push('Foto Base64');
 
-    const rows = filteredAnimals.map(a => {
-      const row: any = {};
-      if (exportConfig.earTag) row['Orecchino'] = a.earTag;
-      if (exportConfig.name) row['Nome'] = a.name || '';
-      if (exportConfig.species) row['Specie'] = a.species;
-      if (exportConfig.breed) row['Razza'] = a.breed || '';
-      if (exportConfig.gender) row['Sesso'] = a.gender || '';
-      if (exportConfig.dateOfBirth) row['Data Nascita'] = a.dateOfBirth || '';
-      if (exportConfig.entryDate) row['Data Ingresso'] = a.entryDate || '';
-      if (exportConfig.origin) row['Provenienza'] = a.origin || '';
-      if (exportConfig.exitDate) row['Data Uscita'] = a.exitDate || '';
-      if (exportConfig.destination) row['Destinazione'] = a.destination || '';
-      if (exportConfig.mod4) row['Mod 4'] = a.mod4 || '';
-      if (exportConfig.healthStatus) row['Salute'] = a.healthStatus || '';
-      if (exportConfig.motherId) row['Madre'] = a.motherId || '';
-      if (exportConfig.fatherId) row['Padre'] = a.fatherId || '';
-      if (exportConfig.documentUrl) row['Documenti'] = a.documentUrl || '';
-      return row;
-    });
-
-    if (exportFormat === 'csv') {
-      const csvContent = "data:text/csv;charset=utf-8," + 
-        [headers.join(','), ...rows.map(r => headers.map(h => `"${String(r[h]).replace(/"/g, '""')}"`).join(','))].join('\n');
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "bestiame.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else if (exportFormat === 'xlsx') {
-      const ws = xlsx.utils.json_to_sheet(rows, { header: headers });
-      const wb = xlsx.utils.book_new();
-      xlsx.utils.book_append_sheet(wb, ws, "Animali");
-      xlsx.writeFile(wb, "bestiame.xlsx");
-    } else if (exportFormat === 'pdf') {
-      const doc = new jsPDF({ orientation: 'landscape' });
-      doc.text("Report Bestiame", 14, 15);
-      const pdfRows = rows.map(r => headers.map(h => String(r[h])));
-      autoTable(doc, {
-        startY: 20,
-        head: [headers],
-        body: pdfRows,
-        theme: 'grid',
-        styles: { fontSize: 8, font: 'helvetica' },
-        headStyles: { fillColor: [20, 20, 20], textColor: [255, 255, 255] }
+      const exportAnimals = filteredAnimals.filter(a => {
+          let match = true;
+          if (exportFilters.breed && (a.breed || '').toLowerCase() !== exportFilters.breed.toLowerCase()) match = false;
+          if (exportFilters.healthStatus && (a.healthStatus || '').toLowerCase() !== exportFilters.healthStatus.toLowerCase()) match = false;
+          if (exportFilters.dateRange.start && (a.dateOfBirth || '') < exportFilters.dateRange.start) match = false;
+          if (exportFilters.dateRange.end && (a.dateOfBirth || '') > exportFilters.dateRange.end) match = false;
+          return match;
       });
-      doc.save("bestiame.pdf");
+
+      const rows: any[] = [];
+      for (const a of exportAnimals) {
+        const row: any = {};
+        if (exportConfig.earTag) row['Orecchino'] = a.earTag;
+        if (exportConfig.name) row['Nome'] = a.name || '';
+        if (exportConfig.species) row['Specie'] = a.species;
+        if (exportConfig.breed) row['Razza'] = a.breed || '';
+        if (exportConfig.gender) row['Sesso'] = a.gender || '';
+        if (exportConfig.dateOfBirth) row['Data Nascita'] = a.dateOfBirth || '';
+        if (exportConfig.entryDate) row['Data Ingresso'] = a.entryDate || '';
+        if (exportConfig.origin) row['Provenienza'] = a.origin || '';
+        if (exportConfig.exitDate) row['Data Uscita'] = a.exitDate || '';
+        if (exportConfig.destination) row['Destinazione'] = a.destination || '';
+        if (exportConfig.mod4) row['Mod 4'] = a.mod4 || '';
+        if (exportConfig.healthStatus) row['Salute'] = a.healthStatus || '';
+        if (exportConfig.motherId) row['Madre'] = a.motherId || '';
+        if (exportConfig.fatherId) row['Padre'] = a.fatherId || '';
+        if (exportConfig.documentUrl) row['Documenti'] = a.documentUrl || '';
+        
+        if (exportConfig.treatments) {
+            const tr = await getTreatmentsForAnimal(a.id);
+            row['Trattamenti (Storico)'] = tr.map(t => `${t.date}: ${t.type}`).join('; ');
+        }
+        if (exportConfig.weights) {
+            const wr = await getWeightsForAnimal(a.id);
+            row['Pesi (Storico)'] = wr.map(w => `${w.date}: ${w.weight}kg`).join('; ');
+        }
+        if (exportConfig.offspring) {
+            const off = animals.filter(child => child.motherId === a.id || child.fatherId === a.id);
+            row['Prole'] = off.map(c => c.earTag).join(', ');
+        }
+        if (exportConfig.photos && a.photoUrls && a.photoUrls.length > 0) {
+            row['Foto Base64'] = exportFormat === 'pdf' ? '[IMG]' : `[${a.photoUrls.length} Foto Presenti]`;
+        } else if (exportConfig.photos) {
+            row['Foto Base64'] = '';
+        }
+
+        rows.push(row);
+      }
+
+      if (exportFormat === 'csv') {
+        const csvContent = "data:text/csv;charset=utf-8," + 
+          [headers.join(','), ...rows.map(r => headers.map(h => `"${String(r[h]).replace(/"/g, '""')}"`).join(','))].join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "mooshion-report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else if (exportFormat === 'xlsx') {
+        const ws = xlsx.utils.json_to_sheet(rows, { header: headers });
+        const wb = xlsx.utils.book_new();
+        xlsx.utils.book_append_sheet(wb, ws, "Animali");
+        xlsx.writeFile(wb, "mooshion-report.xlsx");
+      } else if (exportFormat === 'pdf') {
+        const doc = new jsPDF({ orientation: 'landscape' });
+        doc.text("Report MOOSHion - Dettaglio Bestiame", 14, 15);
+        
+        let photoColIndex = -1;
+        if (exportConfig.photos) {
+           photoColIndex = headers.indexOf('Foto Base64');
+        }
+
+        const pdfRows = rows.map(r => headers.map(h => String(r[h])));
+        autoTable(doc, {
+          startY: 20,
+          head: [headers],
+          body: pdfRows,
+          theme: 'grid',
+          styles: { fontSize: 8, font: 'helvetica', cellPadding: 2, minCellHeight: exportConfig.photos ? 12 : 5 },
+          headStyles: { fillColor: [20, 20, 20], textColor: [255, 255, 255] },
+          didDrawCell: (data: any) => {
+             if (exportConfig.photos && data.section === 'body' && data.column.index === photoColIndex) {
+                 const animalRow = exportAnimals[data.row.index];
+                 if (animalRow && animalRow.photoUrls && animalRow.photoUrls[0]) {
+                     const dim = 10;
+                     try {
+                       const imgData = animalRow.photoUrls[0];
+                       if (imgData.startsWith('data:image')) {
+                           doc.addImage(imgData, data.cell.x + 2, data.cell.y + 1, dim, dim);
+                       }
+                     } catch(e) {}
+                 }
+             }
+          }
+        });
+        doc.save("mooshion-report.pdf");
+      }
+    } finally {
+      setExportProgress('');
+      setIsExportModalOpen(false);
     }
-    setIsExportModalOpen(false);
   };
 
   const handleImportXLSX = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -174,42 +262,7 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
     if(fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Report Bestiame", 14, 15);
 
-    const headConfig: string[] = [];
-    if (pdfConfig.earTag) headConfig.push('Orecchino');
-    if (pdfConfig.name) headConfig.push('Nome');
-    if (pdfConfig.species) headConfig.push('Specie');
-    if (pdfConfig.breed) headConfig.push('Razza');
-    if (pdfConfig.dateOfBirth) headConfig.push('Data Nascita');
-    if (pdfConfig.healthStatus) headConfig.push('Salute');
-    if (pdfConfig.gender) headConfig.push('Sesso');
-
-    const bodyData = filteredAnimals.map(a => {
-      const row = [];
-      if (pdfConfig.earTag) row.push(a.earTag);
-      if (pdfConfig.name) row.push(a.name || '');
-      if (pdfConfig.species) row.push(a.species);
-      if (pdfConfig.breed) row.push(a.breed || '');
-      if (pdfConfig.dateOfBirth) row.push(a.dateOfBirth);
-      if (pdfConfig.healthStatus) row.push(a.healthStatus || '');
-      if (pdfConfig.gender) row.push(a.gender || '');
-      return row;
-    });
-
-    autoTable(doc, {
-      startY: 20,
-      head: [headConfig],
-      body: bodyData,
-      theme: 'grid',
-      styles: { fontSize: 8, font: 'helvetica' },
-      headStyles: { fillColor: [20, 20, 20], textColor: [255, 255, 255] }
-    });
-    doc.save("bestiame.pdf");
-    setIsPdfModalOpen(false);
-  };
 
   const handleScanEarTag = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -245,6 +298,7 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
       breed: formData.get('breed') as string,
       healthStatus: formData.get('healthStatus') as string || 'Sano',
       photoUrl: formData.get('photoUrl') as string,
+      photoUrls: uploadedPhotos,
       motherId: formData.get('motherId') as string || undefined,
       fatherId: formData.get('fatherId') as string || undefined,
       entryDate: formData.get('entryDate') as string,
@@ -258,7 +312,7 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
 
     // Clean up empty fields
     Object.keys(data).forEach(key => {
-      if (data[key] === '') {
+      if (data[key] === '' || (Array.isArray(data[key]) && data[key].length === 0)) {
         delete data[key];
       }
     });
@@ -274,6 +328,7 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingAnimal(null);
+    setUploadedPhotos([]);
   };
 
   return (
@@ -304,17 +359,23 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
         </div>
       </div>
 
-      <div className="relative max-w-sm mb-6">
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <Search className="h-4 w-4 opacity-50" />
+      <div className="flex items-center gap-3 mb-6">
+        <div className="relative max-w-sm flex-1">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <Search className="h-4 w-4 opacity-50" />
+          </div>
+          <input
+            type="text"
+            className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2.5 pl-10 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] shadow-[4px_4px_0px_0px_var(--fg-color)]"
+            placeholder="CERCA ORECCHINO/NOME..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-        <input
-          type="text"
-          className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2.5 pl-10 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] shadow-[4px_4px_0px_0px_var(--fg-color)]"
-          placeholder="CERCA ORECCHINO/NOME..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <button onClick={() => setIsQRScannerOpen(true)} className="p-3 bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[4px_4px_0px_0px_var(--fg-color)] hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center gap-2" title="Scansione QR per Ricerca / Navigazione">
+          <QrCode size={18} />
+          <span className="text-[10px] uppercase font-bold tracking-widest hidden sm:inline">Scanner QR</span>
+        </button>
       </div>
 
       {/* Grid */}
@@ -339,8 +400,8 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                 <tr key={animal.id} className="hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] group cursor-pointer transition-colors bg-[var(--card-bg)]">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      {animal.photoUrl ? (
-                         <img src={animal.photoUrl} alt="" className="w-10 h-10 border border-[var(--fg-color)] object-cover grayscale group-hover:grayscale-0 transition-all" />
+                      {animal.photoUrl || (animal.photoUrls && animal.photoUrls.length > 0) ? (
+                         <img src={animal.photoUrls?.[0] || animal.photoUrl} alt="" className="w-10 h-10 border border-[var(--fg-color)] object-cover grayscale group-hover:grayscale-0 transition-all" />
                       ) : (
                          <div className="w-10 h-10 bg-[var(--bg-color)] border border-[var(--fg-color)] flex items-center justify-center font-mono text-xs text-[var(--fg-color)] font-bold group-hover:bg-[var(--card-bg)] transition-colors">
                            {animal.species?.[0]?.toUpperCase() || '-'}
@@ -367,11 +428,11 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs font-mono group-hover:text-white">
-                    {animal.dateOfBirth.split('-').reverse().join('/')}
+                    {(animal.dateOfBirth || '').split('-').reverse().join('/')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-[10px] uppercase font-bold tracking-widest gap-2 flex justify-end">
                     <Link to={`/animal/${animal.id}`} className="border border-[var(--fg-color)] text-[var(--fg-color)] bg-[var(--card-bg)] group-hover:bg-transparent group-hover:border-[var(--bg-color)] group-hover:text-[var(--bg-color)] px-3 py-1.5 transition-colors">Dettagli</Link>
-                    <button onClick={() => { setEditingAnimal(animal); setIsModalOpen(true); }} className="border border-[var(--fg-color)] text-[var(--fg-color)] bg-[var(--card-bg)] group-hover:bg-transparent group-hover:border-[var(--bg-color)] group-hover:text-[var(--bg-color)] px-3 py-1.5 transition-colors">Modifica</button>
+                    <button onClick={() => { setEditingAnimal(animal); setUploadedPhotos(animal.photoUrls || []); setIsModalOpen(true); }} className="border border-[var(--fg-color)] text-[var(--fg-color)] bg-[var(--card-bg)] group-hover:bg-transparent group-hover:border-[var(--bg-color)] group-hover:text-[var(--bg-color)] px-3 py-1.5 transition-colors">Modifica</button>
                     <button onClick={() => confirm('Sei sicuro?') && deleteAnimal(animal.id)} className="border border-[var(--fg-color)] text-[var(--fg-color)] bg-red-200 group-hover:bg-red-600 group-hover:text-white group-hover:border-transparent px-3 py-1.5 transition-colors">Elimina</button>
                   </td>
                 </tr>
@@ -493,8 +554,22 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                       </select>
                     </div>
                     <div className="col-span-2">
-                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">URL Foto dell'animale</label>
+                      <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">URL Foto Singola (Vecchio formato)</label>
                       <input type="url" name="photoUrl" defaultValue={editingAnimal?.photoUrl} placeholder="https://..." className="block w-full border border-[var(--fg-color)] bg-[var(--bg-color)]/30 py-2 px-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
+                    </div>
+                    <div className="col-span-2">
+                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Carica Foto (Verranno incluse nel PDF)</label>
+                       <input type="file" multiple accept="image/*" onChange={handlePhotoUpload} className="block w-full border border-[var(--fg-color)] bg-[var(--bg-color)]/30 py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
+                       {uploadedPhotos.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                             {uploadedPhotos.map((p, i) => (
+                                <div key={i} className="relative w-16 h-16 border border-[var(--fg-color)]">
+                                   <img src={p} className="w-full h-full object-cover" />
+                                   <button type="button" onClick={() => removePhoto(i)} className="absolute -top-2 -right-2 bg-red-500 text-white p-0.5 rounded-full"><Trash2 size={12} /></button>
+                                </div>
+                             ))}
+                          </div>
+                       )}
                     </div>
                     <div className="col-span-2">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">URL Documenti (PDF/Word/Foto)</label>
@@ -525,6 +600,39 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                <h3 className="text-2xl font-bold tracking-tighter uppercase mb-2 flex items-center gap-2">
                  <Settings2 className="w-6 h-6" /> Export {exportFormat.toUpperCase()}
                </h3>
+               
+               <div className="mb-6 space-y-3">
+                  <h4 className="font-bold text-xs uppercase tracking-widest border-b border-[var(--fg-color)] pb-2 opacity-80">Filtri Report</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                     <div>
+                        <label className="block text-[8px] uppercase tracking-widest opacity-60">Razza</label>
+                        <select className="w-full text-xs border border-[var(--fg-color)] bg-[var(--bg-color)] p-1 focus:outline-none" value={exportFilters.breed} onChange={e => setExportFilters(p => ({ ...p, breed: e.target.value }))}>
+                           <option value="">Tutte</option>
+                           {[...new Set(animals.map(a => a.breed).filter(Boolean))].map(b => <option key={b} value={b}>{b}</option>)}
+                        </select>
+                     </div>
+                     <div>
+                        <label className="block text-[8px] uppercase tracking-widest opacity-60">Stato Salute</label>
+                        <select className="w-full text-xs border border-[var(--fg-color)] bg-[var(--bg-color)] p-1 focus:outline-none" value={exportFilters.healthStatus} onChange={e => setExportFilters(p => ({ ...p, healthStatus: e.target.value }))}>
+                           <option value="">Tutti</option>
+                           <option value="Sano">Sano</option>
+                           <option value="Malato">Malato</option>
+                           <option value="In Osservazione">In Osservazione</option>
+                        </select>
+                     </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[8px] uppercase tracking-widest opacity-60">Nati Da</label>
+                        <input type="date" className="w-full text-xs font-mono border border-[var(--fg-color)] bg-[var(--bg-color)] p-1 focus:outline-none" value={exportFilters.dateRange.start} onChange={e => setExportFilters(p => ({ ...p, dateRange: { ...p.dateRange, start: e.target.value } }))} />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] uppercase tracking-widest opacity-60">Nati Fino A</label>
+                        <input type="date" className="w-full text-xs font-mono border border-[var(--fg-color)] bg-[var(--bg-color)] p-1 focus:outline-none" value={exportFilters.dateRange.end} onChange={e => setExportFilters(p => ({ ...p, dateRange: { ...p.dateRange, end: e.target.value } }))} />
+                      </div>
+                  </div>
+               </div>
+
                <p className="font-serif italic text-[11px] uppercase opacity-60 mb-6 border-b border-[var(--fg-color)] pb-4 flex justify-between items-center">
                  Seleziona i campi da esportare
                  <div className="flex gap-2">
@@ -539,7 +647,8 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                         earTag: 'Orecchino', name: 'Nome', species: 'Specie', breed: 'Razza', gender: 'Sesso',
                         dateOfBirth: 'Data Nascita', entryDate: 'Data Ingresso', origin: 'Provenienza',
                         exitDate: 'Data Uscita', destination: 'Destinazione', mod4: 'Mod 4', healthStatus: 'Salute',
-                        motherId: 'Madre', fatherId: 'Padre', documentUrl: 'Documenti'
+                        motherId: 'Madre', fatherId: 'Padre', documentUrl: 'Documenti',
+                        treatments: 'Trattamenti', weights: 'Storico Pesi', offspring: 'Prole', photos: 'Foto'
                      };
                      return (
                       <label key={key} className="flex items-center space-x-3 cursor-pointer group">
@@ -555,13 +664,21 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                   })}
                </div>
 
-               <div className="mt-8 flex gap-3">
-                  <button onClick={executeExport} className="flex-1 w-full inline-flex justify-center border border-transparent bg-[var(--fg-color)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] hover:bg-[var(--card-bg)] hover:border-[var(--fg-color)] hover:text-[var(--fg-color)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all">
-                     Genera File
-                  </button>
-                  <button onClick={() => setIsExportModalOpen(false)} className="w-auto inline-flex justify-center border border-[var(--fg-color)] bg-[var(--card-bg)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--fg-color)] hover:bg-[var(--bg-color)] transition-colors">
-                     Chiudi
-                  </button>
+               <div className="mt-8 flex gap-3 flex-col sm:flex-row">
+                  {exportProgress ? (
+                     <div className="flex-1 w-full text-center py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--fg-color)] opacity-70 animate-pulse">
+                        {exportProgress}
+                     </div>
+                  ) : (
+                    <>
+                      <button onClick={executeExport} className="flex-1 w-full inline-flex justify-center border border-transparent bg-[var(--fg-color)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] hover:bg-[var(--card-bg)] hover:border-[var(--fg-color)] hover:text-[var(--fg-color)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all">
+                         Genera File
+                      </button>
+                      <button onClick={() => setIsExportModalOpen(false)} className="w-auto inline-flex justify-center border border-[var(--fg-color)] bg-[var(--card-bg)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--fg-color)] hover:bg-[var(--bg-color)] transition-colors">
+                         Chiudi
+                      </button>
+                    </>
+                  )}
                </div>
             </div>
           </div>
@@ -577,9 +694,21 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                <h3 className="text-xl font-bold tracking-tighter uppercase mb-4">Scanner QR</h3>
                <div className="w-full aspect-square bg-[var(--bg-color)] border border-[var(--fg-color)] overflow-hidden">
                   <Scanner onScan={(result) => {
-                     if (result && result.length > 0 && earTagRef.current) {
-                        earTagRef.current.value = result[0].rawValue;
+                     if (result && result.length > 0) {
+                        const val = result[0].rawValue;
                         setIsQRScannerOpen(false);
+                        
+                        if (val.startsWith(window.location.origin + '/animal/')) {
+                            window.location.href = val;
+                        } else if (val.startsWith('http')) {
+                            window.location.href = val;
+                        } else {
+                            if (isModalOpen && earTagRef.current) {
+                               earTagRef.current.value = val;
+                            } else {
+                               setSearchTerm(val);
+                            }
+                        }
                      }
                   }} />
                </div>

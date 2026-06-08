@@ -6,7 +6,8 @@ import { db } from '../lib/db-mock';
 import { collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc } from '../lib/db-mock';
 import { subscribeToTreatments, subscribeToWeights, addTreatment, addWeightRecord, updateAnimal } from '../lib/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ArrowLeft, Stethoscope, Scale, GitMerge, FileText, Image as ImageIcon, Camera, UploadCloud, X } from 'lucide-react';
+import { ArrowLeft, Stethoscope, Scale, GitMerge, FileText, Image as ImageIcon, Camera, UploadCloud, X, QrCode } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import FamilyTree from './FamilyTree';
 
 interface DetailProps {
@@ -32,6 +33,7 @@ export default function AnimalDetail({ user }: DetailProps) {
   const [showTreatmentModal, setShowTreatmentModal] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'health' | 'weight' | 'family' | 'photos'>('health');
 
   useEffect(() => {
@@ -191,7 +193,12 @@ export default function AnimalDetail({ user }: DetailProps) {
           <div className="flex-1 w-full">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-4xl font-bold text-[var(--fg-color)] font-mono tracking-tighter uppercase">{animal.earTag}</h1>
+                <h1 className="text-4xl font-bold text-[var(--fg-color)] font-mono tracking-tighter uppercase flex items-center gap-3">
+                  {animal.earTag}
+                  <button onClick={() => setShowQRModal(true)} className="p-2 border border-[var(--fg-color)] bg-[var(--card-bg)] shadow-[2px_2px_0px_0px_var(--fg-color)] hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all" title="Codice QR Animale">
+                    <QrCode size={20} />
+                  </button>
+                </h1>
                 <p className="text-sm font-serif italic text-[var(--fg-color)] opacity-60 uppercase">{animal.name || 'Senza nome'}</p>
               </div>
               <span className={`inline-flex items-center px-3 py-1 border border-[var(--fg-color)] text-[10px] font-bold uppercase tracking-widest ${
@@ -226,17 +233,17 @@ export default function AnimalDetail({ user }: DetailProps) {
 
         {/* Tabs */}
         <div className="bg-[#D8D7D3]">
-          <nav className="flex divide-x divide-[var(--fg-color)]">
-            <button onClick={() => setActiveTab('health')} className={`flex-1 whitespace-nowrap flex justify-center py-4 px-1 font-bold text-[11px] uppercase tracking-widest transition-colors ${activeTab === 'health' ? 'bg-[var(--fg-color)] text-[var(--bg-color)]' : 'text-[var(--fg-color)] hover:bg-[var(--card-bg)]'}`}>
+          <nav className="flex overflow-x-auto no-scrollbar divide-x divide-[var(--fg-color)]">
+            <button onClick={() => setActiveTab('health')} className={`flex-1 shrink-0 px-4 whitespace-nowrap flex justify-center py-4 font-bold text-[11px] uppercase tracking-widest transition-colors ${activeTab === 'health' ? 'bg-[var(--fg-color)] text-[var(--bg-color)]' : 'text-[var(--fg-color)] hover:bg-[var(--card-bg)]'}`}>
               <Stethoscope className="mr-2 h-4 w-4" /> Salute & Cure
             </button>
-            <button onClick={() => setActiveTab('weight')} className={`flex-1 whitespace-nowrap flex justify-center py-4 px-1 font-bold text-[11px] uppercase tracking-widest transition-colors ${activeTab === 'weight' ? 'bg-[var(--fg-color)] text-[var(--bg-color)]' : 'text-[var(--fg-color)] hover:bg-[var(--card-bg)]'}`}>
+            <button onClick={() => setActiveTab('weight')} className={`flex-1 shrink-0 px-4 whitespace-nowrap flex justify-center py-4 font-bold text-[11px] uppercase tracking-widest transition-colors ${activeTab === 'weight' ? 'bg-[var(--fg-color)] text-[var(--bg-color)]' : 'text-[var(--fg-color)] hover:bg-[var(--card-bg)]'}`}>
               <Scale className="mr-2 h-4 w-4" /> Monitoraggio Peso
             </button>
-            <button onClick={() => setActiveTab('family')} className={`flex-1 whitespace-nowrap flex justify-center py-4 px-1 font-bold text-[11px] uppercase tracking-widest transition-colors ${activeTab === 'family' ? 'bg-[var(--fg-color)] text-[var(--bg-color)]' : 'text-[var(--fg-color)] hover:bg-[var(--card-bg)]'}`}>
+            <button onClick={() => setActiveTab('family')} className={`flex-1 shrink-0 px-4 whitespace-nowrap flex justify-center py-4 font-bold text-[11px] uppercase tracking-widest transition-colors ${activeTab === 'family' ? 'bg-[var(--fg-color)] text-[var(--bg-color)]' : 'text-[var(--fg-color)] hover:bg-[var(--card-bg)]'}`}>
               <GitMerge className="mr-2 h-4 w-4" /> Albero Genealogico
             </button>
-            <button onClick={() => setActiveTab('photos')} className={`flex-1 whitespace-nowrap flex justify-center py-4 px-1 font-bold text-[11px] uppercase tracking-widest transition-colors ${activeTab === 'photos' ? 'bg-[var(--fg-color)] text-[var(--bg-color)]' : 'text-[var(--fg-color)] hover:bg-[var(--card-bg)]'}`}>
+            <button onClick={() => setActiveTab('photos')} className={`flex-1 shrink-0 px-4 whitespace-nowrap flex justify-center py-4 font-bold text-[11px] uppercase tracking-widest transition-colors ${activeTab === 'photos' ? 'bg-[var(--fg-color)] text-[var(--bg-color)]' : 'text-[var(--fg-color)] hover:bg-[var(--card-bg)]'}`}>
               <ImageIcon className="mr-2 h-4 w-4" /> Galleria Foto
             </button>
           </nav>
@@ -477,6 +484,69 @@ export default function AnimalDetail({ user }: DetailProps) {
                   </button>
                 </div>
               </form>
+            </div>
+           </div>
+        </div>
+      )}
+      {showQRModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+           <div className="flex min-h-screen items-center justify-center p-4 text-center">
+            <div className="fixed inset-0 bg-[var(--fg-color)]/50 backdrop-blur-sm" onClick={() => setShowQRModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] text-left transform transition-all sm:my-8 sm:align-middle sm:max-w-sm w-full">
+              <div className="p-8 text-center flex flex-col items-center">
+                <div className="flex justify-between items-start w-full border-b border-[var(--fg-color)] pb-4 mb-6">
+                  <div className="text-left">
+                    <h3 className="text-2xl font-bold tracking-tighter uppercase mb-1">Passaporto Digitale</h3>
+                    <p className="font-serif italic text-[11px] uppercase opacity-60">Scansiona per aprire la scheda</p>
+                  </div>
+                  <button type="button" onClick={() => setShowQRModal(false)} className="text-[var(--fg-color)] hover:opacity-50"><X size={24} /></button>
+                </div>
+                
+                <div className="bg-white p-4 border-2 border-[var(--fg-color)] inline-block mb-6 relative" id="qr-code-container">
+                  <QRCodeSVG 
+                    value={`${window.location.origin}/animal/${animal.id}`} 
+                    size={200}
+                    level="H"
+                    includeMargin={true}
+                    fgColor="#000000"
+                    bgColor="#ffffff"
+                  />
+                  {/* Decorative corners */}
+                  <div className="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-black"></div>
+                  <div className="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-black"></div>
+                  <div className="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-black"></div>
+                  <div className="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-black"></div>
+                </div>
+
+                <div className="w-full flex flex-col gap-2">
+                   <p className="font-mono font-bold text-lg">{animal.earTag}</p>
+                   {animal.name && <p className="font-serif italic text-sm">{animal.name}</p>}
+                </div>
+              </div>
+              <div className="bg-[var(--bg-color)] px-8 py-4 flex flex-row-reverse border-t border-[var(--fg-color)] gap-3">
+                <button type="button" onClick={() => {
+                   const svg = document.querySelector('#qr-code-container svg');
+                   if (svg) {
+                      const svgData = new XMLSerializer().serializeToString(svg);
+                      const canvas = document.createElement('canvas');
+                      const ctx = canvas.getContext('styled_for_image'); // typo avoidance
+                      const xml = `<?xml version="1.0" standalone="no"?>\r\n${svgData}`;
+                      const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+                      
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `QR_${animal.earTag}.svg`;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                   }
+                }} className="inline-flex justify-center border border-transparent bg-[var(--fg-color)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] hover:bg-[var(--card-bg)] hover:border-[var(--fg-color)] hover:text-[var(--fg-color)] focus:outline-none focus:ring-0 active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+                  Download SVG
+                </button>
+                <button type="button" onClick={() => window.print()} className="inline-flex justify-center border border-[var(--fg-color)] bg-[var(--card-bg)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--fg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] hover:bg-[var(--bg-color)] focus:outline-none focus:ring-0 active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+                  Stampa Scheda
+                </button>
+              </div>
             </div>
            </div>
         </div>

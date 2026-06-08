@@ -63,7 +63,27 @@ export const addTreatment = async (animalId: string, treatment: Omit<Treatment, 
     }
 };
 
-// Weight Records
+export const getTreatmentsForAnimal = async (animalId: string) => {
+  try {
+    const colRef = collection(db, 'animals', animalId, 'treatments');
+    const snapshot = await getDocs(colRef);
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Treatment));
+  } catch (error) {
+    console.error('Error fetching treatments:', error);
+    return [];
+  }
+};
+
+export const getWeightsForAnimal = async (animalId: string) => {
+  try {
+    const colRef = collection(db, 'animals', animalId, 'weight_history');
+    const snapshot = await getDocs(colRef);
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as WeightRecord));
+  } catch (error) {
+    console.error('Error fetching weights:', error);
+    return [];
+  }
+};
 export const subscribeToWeights = (animalId: string, callback: (weights: WeightRecord[]) => void) => {
   const colRef = collection(db, 'animals', animalId, 'weight_history');
   return onSnapshot(colRef, (snapshot) => {

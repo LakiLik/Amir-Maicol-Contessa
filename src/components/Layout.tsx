@@ -76,7 +76,7 @@ export default function Layout({ user }: LayoutProps) {
       {/* Mobile menu button */}
       <div className="md:hidden fixed top-0 w-full z-50 bg-[var(--bg-color)] border-b border-[var(--fg-color)] px-4 h-16 flex items-center justify-between">
         <div className="flex items-center">
-          <img src="/logo.png" alt="" className="w-6 h-6 mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
+          <img src="/logo.png" alt="" className="w-6 h-6 rounded-md mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
           <div className="flex flex-col items-start mt-1">
             <span className="text-xl font-bold tracking-tighter uppercase leading-none">MOOSH<span className="font-light opacity-60 lowercase">ion</span></span>
             <span className="text-[7px] font-bold font-mono uppercase tracking-widest opacity-60 mt-[2px]">Beyond the farm</span>
@@ -163,7 +163,7 @@ export default function Layout({ user }: LayoutProps) {
         {/* Top Status Bar desktop */}
         <header className="hidden md:flex items-center justify-between px-6 py-4 border-b border-[var(--fg-color)]">
            <div className="flex items-center">
-             <img src="/logo.png" alt="" className="w-8 h-8 mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
+             <img src="/logo.png" alt="" className="w-8 h-8 rounded-lg mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
              <div className="flex flex-col items-start mt-1">
                <span className="text-xl font-bold tracking-tighter uppercase leading-none">MOOSH<span className="font-light opacity-60 lowercase">ion</span></span>
                <span className="text-[8px] font-bold font-mono uppercase tracking-widest opacity-60 mt-[2px]">Beyond the farm</span>
@@ -174,8 +174,8 @@ export default function Layout({ user }: LayoutProps) {
              <button onClick={toggleTheme} className="flex items-center justify-center p-2 mr-4 border border-[var(--fg-color)] bg-[var(--card-bg)] font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer" title="Cambia Tema">
                {isDark ? <Moon size={16} /> : <Circle size={16} fill="currentColor" />}
              </button>
-             <button type="button" onClick={() => window.location.reload()} className="flex items-center gap-2 px-3 py-1 mr-4 border border-[var(--fg-color)] bg-[var(--card-bg)] font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
-                <RefreshCw size={12} /> Aggiorna Dati
+             <button type="button" onClick={() => window.location.reload()} title="Aggiorna Dati" className="flex items-center justify-center p-2 mr-4 border border-[var(--fg-color)] bg-[var(--card-bg)] font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
+                <RefreshCw size={16} />
              </button>
              <div className={`flex items-center px-3 py-1 font-mono text-[10px] uppercase font-bold tracking-widest border border-[var(--fg-color)] mr-4 transition-colors ${isOnline ? 'bg-[var(--card-bg)] text-[var(--fg-color)]' : 'bg-red-100 text-red-900 border-red-900'}`}>
                 <span className={`w-2 h-2 rounded-full mr-2 ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>

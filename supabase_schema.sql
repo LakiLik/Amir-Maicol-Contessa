@@ -33,6 +33,13 @@ CREATE TABLE IF NOT EXISTS public.animals (
     "motherId" TEXT,
     "fatherId" TEXT,
     "photoUrl" TEXT,
+    "photoUrls" JSONB,
+    "documentUrl" TEXT,
+    "entryDate" TEXT,
+    "exitDate" TEXT,
+    "origin" TEXT,
+    "destination" TEXT,
+    "mod4" TEXT,
     "currentWeight" NUMERIC,
     "gpsTagId" TEXT,
     "lastLocation" JSONB,
@@ -45,6 +52,13 @@ ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "name" TEXT;
 ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "motherId" TEXT;
 ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "fatherId" TEXT;
 ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "photoUrl" TEXT;
+ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "photoUrls" JSONB;
+ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "documentUrl" TEXT;
+ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "entryDate" TEXT;
+ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "exitDate" TEXT;
+ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "origin" TEXT;
+ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "destination" TEXT;
+ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "mod4" TEXT;
 ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "currentWeight" NUMERIC;
 ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "gpsTagId" TEXT;
 ALTER TABLE public.animals ADD COLUMN IF NOT EXISTS "lastLocation" JSONB;
