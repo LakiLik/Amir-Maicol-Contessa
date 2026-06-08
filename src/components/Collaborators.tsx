@@ -74,7 +74,7 @@ export default function Collaborators({ user }: CollaboratorsProps) {
 
   return (
     <div className="space-y-6 pb-20">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-[#141414] pb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-[var(--fg-color)] pb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tighter uppercase mb-1 flex items-center gap-2">
             <Users className="w-8 h-8" />
@@ -82,12 +82,12 @@ export default function Collaborators({ user }: CollaboratorsProps) {
           </h1>
           <p className="font-serif italic text-sm uppercase opacity-60">Gestione accessi e condivisione</p>
         </div>
-        <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center text-xs border border-[#141414] bg-[#141414] text-[#E4E3E0] px-4 py-3 font-bold uppercase tracking-widest hover:bg-white hover:text-[#141414] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
+        <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center text-xs border border-[var(--fg-color)] bg-[var(--fg-color)] text-[var(--bg-color)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--card-bg)] hover:text-[var(--fg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
           <Plus size={14} className="mr-2" /> Aggiungi
         </button>
       </div>
 
-      <div className="bg-white border border-[#141414] shadow-[4px_4px_0px_0px_#141414] overflow-hidden">
+      <div className="bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[4px_4px_0px_0px_var(--fg-color)] overflow-hidden">
         {loading ? (
           <div className="p-8 text-center font-mono text-xs animate-pulse opacity-50 uppercase tracking-widest">Caricamento collaboratori...</div>
         ) : collaborators.length === 0 ? (
@@ -96,11 +96,11 @@ export default function Collaborators({ user }: CollaboratorsProps) {
              <p className="text-[10px] font-mono opacity-50 uppercase tracking-widest">Nessun collaboratore aggiunto. Clicca su "Aggiungi" per iniziare a condividere i tuoi dati.</p>
           </div>
         ) : (
-          <div className="divide-y divide-[#141414]">
+          <div className="divide-y divide-[var(--fg-color)]">
             {collaborators.map(c => (
-              <div key={c.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-[#E4E3E0] transition-colors gap-4">
+              <div key={c.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-[var(--bg-color)] transition-colors gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-[#141414] text-[#E4E3E0] flex items-center justify-center">
+                  <div className="w-10 h-10 bg-[var(--fg-color)] text-[var(--bg-color)] flex items-center justify-center">
                     <Mail size={16} />
                   </div>
                   <div>
@@ -114,7 +114,7 @@ export default function Collaborators({ user }: CollaboratorsProps) {
                    <div className="text-[9px] font-mono uppercase tracking-widest opacity-40 hidden sm:block mr-4">
                       Aggiunto: {new Date(c.createdAt).toLocaleDateString()}
                    </div>
-                   <button onClick={() => handleDelete(c.id)} className="p-2 border border-[#141414] text-red-600 bg-white hover:bg-red-50 hover:text-red-700 transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+                   <button onClick={() => handleDelete(c.id)} className="p-2 border border-[var(--fg-color)] text-red-600 bg-[var(--card-bg)] hover:bg-red-50 hover:text-red-700 transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
                      <Trash2 size={14} />
                    </button>
                 </div>
@@ -125,9 +125,9 @@ export default function Collaborators({ user }: CollaboratorsProps) {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-[#E4E3E0]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white border-2 border-[#141414] shadow-[8px_8px_0px_0px_#141414] w-full max-w-md">
-            <div className="p-6 border-b border-[#141414] flex justify-between items-center bg-[#141414] text-[#E4E3E0]">
+        <div className="fixed inset-0 bg-[var(--bg-color)]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[var(--card-bg)] border-2 border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] w-full max-w-md">
+            <div className="p-6 border-b border-[var(--fg-color)] flex justify-between items-center bg-[var(--fg-color)] text-[var(--bg-color)]">
               <h2 className="text-xl font-bold tracking-tighter uppercase">Nuovo Collaboratore</h2>
               <button type="button" onClick={() => setIsModalOpen(false)} className="hover:opacity-70 transition-opacity">
                 <Plus size={24} className="rotate-45" />
@@ -137,12 +137,12 @@ export default function Collaborators({ user }: CollaboratorsProps) {
             <form onSubmit={handleAddSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Email Collaboratore</label>
-                <input type="email" name="email" required placeholder="collaboratore@email.com" className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414] font-mono" />
+                <input type="email" name="email" required placeholder="collaboratore@email.com" className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono" />
               </div>
               
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Ruolo</label>
-                <select name="role" required className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[#141414] font-mono">
+                <select name="role" required className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
                   <option value="Collaboratore">Collaboratore</option>
                   <option value="Veterinario">Veterinario</option>
                 </select>
@@ -152,10 +152,10 @@ export default function Collaborators({ user }: CollaboratorsProps) {
               </div>
 
               <div className="pt-4 flex gap-2">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 text-xs border border-[#141414] bg-white px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
                   Annulla
                 </button>
-                <button type="submit" className="flex-1 text-xs border border-[#141414] bg-[#141414] text-[#E4E3E0] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#E4E3E0] hover:text-[#141414] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
+                <button type="submit" className="flex-1 text-xs border border-[var(--fg-color)] bg-[var(--fg-color)] text-[var(--bg-color)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--bg-color)] hover:text-[var(--fg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
                   Aggiungi
                 </button>
               </div>

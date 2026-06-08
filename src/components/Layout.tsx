@@ -1,7 +1,7 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { LayoutDashboard, TableProperties, LogOut, Menu, X, Wheat, Droplet, Bell, Database, Map, Users, RefreshCw } from 'lucide-react';
+import { LayoutDashboard, TableProperties, LogOut, Menu, X, Wheat, Droplet, Bell, Database, Map, Users, RefreshCw, Moon, Circle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 // import { collection, query, where, onSnapshot } from '../lib/db-mock';
 // import { db } from '../lib/db-mock';
@@ -16,6 +16,21 @@ export default function Layout({ user }: LayoutProps) {
   const [unreadAlerts, setUnreadAlerts] = useState<number>(0);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [lastSync, setLastSync] = useState(new Date().toLocaleTimeString());
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+  }, []);
+
+  const toggleTheme = () => {
+    const nextDark = !isDark;
+    setIsDark(nextDark);
+    if (nextDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
 
   useEffect(() => {
     const handleOnline = () => { setIsOnline(true); setLastSync(new Date().toLocaleTimeString()); };
@@ -57,17 +72,26 @@ export default function Layout({ user }: LayoutProps) {
   ];
 
   return (
-    <div className="flex h-[100dvh] overflow-hidden bg-[#E4E3E0] text-[#141414] font-sans border-0 md:border-[12px] border-[#141414]">
+    <div className="flex h-[100dvh] overflow-hidden bg-[var(--bg-color)] text-[var(--fg-color)] font-sans border-0 md:border-[12px] border-[var(--fg-color)]">
       {/* Mobile menu button */}
-      <div className="md:hidden fixed top-0 w-full z-50 bg-[#E4E3E0] border-b border-[#141414] px-4 h-16 flex items-center justify-between">
-        <span className="text-xl font-bold tracking-tighter uppercase">AgroSync <span className="font-normal italic font-serif opacity-70">Pro</span></span>
+      <div className="md:hidden fixed top-0 w-full z-50 bg-[var(--bg-color)] border-b border-[var(--fg-color)] px-4 h-16 flex items-center justify-between">
+        <div className="flex items-center">
+          <img src="/logo.png" alt="" className="w-6 h-6 mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
+          <div className="flex flex-col items-start mt-1">
+            <span className="text-xl font-bold tracking-tighter uppercase leading-none">MOOSH<span className="font-light opacity-60 lowercase">ion</span></span>
+            <span className="text-[7px] font-bold font-mono uppercase tracking-widest opacity-60 mt-[2px]">Beyond the farm</span>
+          </div>
+        </div>
         <div className="flex items-center gap-2">
-           <button onClick={() => window.location.reload()} className="p-2 border border-[#141414] bg-white shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer" title="Aggiorna dati">
+           <button onClick={toggleTheme} className="p-2 border border-[var(--fg-color)] bg-[var(--card-bg)] shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer" title="Cambia Tema">
+             {isDark ? <Moon size={16} /> : <Circle size={16} fill="currentColor" />}
+           </button>
+           <button onClick={() => window.location.reload()} className="p-2 border border-[var(--fg-color)] bg-[var(--card-bg)] shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer" title="Aggiorna dati">
              <RefreshCw size={16} />
            </button>
            <button
              onClick={() => setIsMobileOpen(!isMobileOpen)}
-             className="p-2 text-[#141414] opacity-70 border border-transparent hover:border-[#141414]"
+             className="p-2 text-[var(--fg-color)] opacity-70 border border-transparent hover:border-[var(--fg-color)]"
            >
              {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
            </button>
@@ -76,12 +100,20 @@ export default function Layout({ user }: LayoutProps) {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-[#E4E3E0] border-r border-[#141414] p-6
+        fixed inset-y-0 left-0 z-40 w-64 bg-[var(--bg-color)] border-r border-[var(--fg-color)] p-6
         transform transition-transform duration-200 ease-in-out md:translate-x-0 md:relative md:w-64 flex flex-col space-y-8
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="flex items-center justify-between mb-2 mt-12 md:mt-0">
-          <h1 className="text-2xl font-bold tracking-tighter uppercase">AgroSync <span className="font-normal italic font-serif opacity-70">Pro</span></h1>
+        <div className="hidden md:flex flex-col mb-2 mt-12 md:mt-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <img src="/logo.png" alt="" className="w-8 h-8 mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
+              <div className="flex flex-col items-start">
+                <h1 className="text-2xl font-bold tracking-tighter uppercase leading-none">MOOSH<span className="font-light opacity-60 lowercase">ion</span></h1>
+                <p className="mt-1 text-[9px] font-bold font-mono uppercase tracking-widest opacity-60">Beyond the farm</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <nav className="flex-1 space-y-4">
@@ -94,8 +126,8 @@ export default function Layout({ user }: LayoutProps) {
               className={({ isActive }) => `
                 group flex items-center text-xs font-bold uppercase tracking-widest transition-colors
                 ${isActive 
-                  ? 'underline decoration-2 underline-offset-4 text-[#141414]' 
-                  : 'opacity-40 hover:opacity-100 text-[#141414]'
+                  ? 'underline decoration-2 underline-offset-4 text-[var(--fg-color)]' 
+                  : 'opacity-40 hover:opacity-100 text-[var(--fg-color)]'
                 }
               `}
             >
@@ -105,7 +137,7 @@ export default function Layout({ user }: LayoutProps) {
               />
               <span className="flex-1">{item.name}</span>
               {item.count ? (
-                <span className="ml-auto inline-block py-0.5 px-2 bg-[#141414] text-[#E4E3E0] text-[9px] rounded-sm">
+                <span className="ml-auto inline-block py-0.5 px-2 bg-[var(--fg-color)] text-[var(--bg-color)] text-[9px] rounded-sm">
                   {item.count}
                 </span>
               ) : null}
@@ -113,19 +145,19 @@ export default function Layout({ user }: LayoutProps) {
           ))}
         </nav>
 
-        <div className="mt-auto border-t border-[#141414] pt-4 space-y-4">
+        <div className="mt-auto border-t border-[var(--fg-color)] pt-4 space-y-4">
           <p className="font-serif italic text-[11px] uppercase opacity-50 block mb-2">Operatore</p>
-          <div className="flex items-center space-x-3 bg-white border border-[#141414] shadow-[4px_4px_0px_0px_#141414] p-3">
-            <div className="w-8 h-8 bg-[#141414] text-[#E4E3E0] flex items-center justify-center font-bold text-xs">
+          <div className="flex items-center space-x-3 bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[4px_4px_0px_0px_var(--fg-color)] p-3">
+            <div className="w-8 h-8 bg-[var(--fg-color)] text-[var(--bg-color)] flex items-center justify-center font-bold text-xs">
               {user.email?.[0].toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold font-mono tracking-tighter uppercase truncate text-[#141414]">{user.email?.split('@')[0]}</p>
+              <p className="text-[10px] font-bold font-mono tracking-tighter uppercase truncate text-[var(--fg-color)]">{user.email?.split('@')[0]}</p>
               <p className="text-[9px] font-mono opacity-50 truncate">{user.email}</p>
             </div>
             <button
               onClick={() => supabase.auth.signOut()}
-              className="p-1 border border-[#141414] hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors"
+              className="p-1 border border-[var(--fg-color)] hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors"
               title="Esci"
             >
               <LogOut size={14} />
@@ -137,14 +169,17 @@ export default function Layout({ user }: LayoutProps) {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto flex flex-col pt-16 md:pt-0">
         {/* Top Status Bar desktop */}
-        <header className="hidden md:flex items-center justify-end px-6 py-4 border-b border-[#141414]">
-           <button type="button" onClick={() => window.location.reload()} className="flex items-center gap-2 px-3 py-1 mr-4 border border-[#141414] bg-white font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] shadow-[2px_2px_0px_0px_#141414] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
+        <header className="hidden md:flex items-center justify-end px-6 py-4 border-b border-[var(--fg-color)]">
+           <button onClick={toggleTheme} className="flex items-center justify-center p-2 mr-4 border border-[var(--fg-color)] bg-[var(--card-bg)] font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer" title="Cambia Tema">
+             {isDark ? <Moon size={16} /> : <Circle size={16} fill="currentColor" />}
+           </button>
+           <button type="button" onClick={() => window.location.reload()} className="flex items-center gap-2 px-3 py-1 mr-4 border border-[var(--fg-color)] bg-[var(--card-bg)] font-mono text-[10px] uppercase font-bold tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] transition-colors active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
               <RefreshCw size={12} /> Aggiorna Dati
            </button>
-           <div className={`flex items-center px-3 py-1 font-mono text-[10px] uppercase font-bold tracking-widest border border-[#141414] mr-4 transition-colors ${isOnline ? 'bg-white text-[#141414]' : 'bg-red-100 text-red-900 border-red-900'}`}>
+           <div className={`flex items-center px-3 py-1 font-mono text-[10px] uppercase font-bold tracking-widest border border-[var(--fg-color)] mr-4 transition-colors ${isOnline ? 'bg-[var(--card-bg)] text-[var(--fg-color)]' : 'bg-red-100 text-red-900 border-red-900'}`}>
               <span className={`w-2 h-2 rounded-full mr-2 ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
               {isOnline ? 'ONLINE' : 'OFFLINE'}
-              {isOnline && <span className="border-l border-[#141414]/30 ml-2 pl-2 opacity-70">SYNC: {lastSync}</span>}
+              {isOnline && <span className="border-l border-[var(--fg-color)]/30 ml-2 pl-2 opacity-70">SYNC: {lastSync}</span>}
             </div>
             <div className="text-[10px] font-mono uppercase tracking-widest font-bold">
                {new Date().toLocaleDateString()}

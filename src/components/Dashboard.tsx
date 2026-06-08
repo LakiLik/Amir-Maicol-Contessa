@@ -104,7 +104,7 @@ export default function Dashboard({ user }: DashboardProps) {
   const otherCount = totalAnimals - healthyCount - sickCount - obsCount;
   
   const healthData = [
-     { name: 'Sano', value: healthyCount, color: '#141414' }, // Black
+     { name: 'Sano', value: healthyCount, color: 'var(--fg-color)' }, // Black
      { name: 'Malato', value: sickCount, color: '#DC2626' }, // Red
      { name: 'In Osservazione', value: obsCount, color: '#D97706' }, // Amber
      { name: 'Altro', value: otherCount, color: '#9CA3AF' } // Gray
@@ -167,9 +167,9 @@ export default function Dashboard({ user }: DashboardProps) {
 
   if (loading) {
     return <div className="animate-pulse space-y-6 flex flex-col pt-4">
-      <div className="h-10 w-48 bg-gray-300 border border-[#141414]"></div>
+      <div className="h-10 w-48 bg-gray-300 border border-[var(--fg-color)]"></div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[1,2,3].map(i => <div key={i} className="h-32 bg-gray-300 border border-[#141414]"></div>)}
+        {[1,2,3].map(i => <div key={i} className="h-32 bg-gray-300 border border-[var(--fg-color)]"></div>)}
       </div>
     </div>;
   }
@@ -184,7 +184,7 @@ export default function Dashboard({ user }: DashboardProps) {
       {/* Top Grid: Stats & Weather */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Weather Widget */}
-        <div className="col-span-1 md:col-span-2 p-6 border border-[#141414] bg-[#E4E3E0] shadow-[4px_4px_0px_0px_#141414] flex flex-row items-center justify-between">
+        <div className="col-span-1 md:col-span-2 p-6 border border-[var(--fg-color)] bg-[var(--bg-color)] shadow-[4px_4px_0px_0px_var(--fg-color)] flex flex-row items-center justify-between">
             {weather ? (
                <>
                   <div>
@@ -211,10 +211,10 @@ export default function Dashboard({ user }: DashboardProps) {
             )}
         </div>
 
-        <div className="p-4 border border-[#141414] bg-white shadow-[4px_4px_0px_0px_#141414] flex flex-col justify-between">
+        <div className="p-4 border border-[var(--fg-color)] bg-[var(--card-bg)] shadow-[4px_4px_0px_0px_var(--fg-color)] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <h3 className="font-serif italic text-[10px] uppercase opacity-50">Capi Attivi</h3>
-            <Users className="text-[#141414] w-4 h-4" />
+            <Users className="text-[var(--fg-color)] w-4 h-4" />
           </div>
           <div className="mt-4">
             <span className="text-3xl font-bold font-mono">{totalAnimals}</span>
@@ -222,10 +222,10 @@ export default function Dashboard({ user }: DashboardProps) {
           </div>
         </div>
 
-        <div className="p-4 border border-[#141414] bg-[#141414] text-[#E4E3E0] shadow-[4px_4px_0px_0px_#141414] flex flex-col justify-between">
+        <div className="p-4 border border-[var(--fg-color)] bg-[var(--fg-color)] text-[var(--bg-color)] shadow-[4px_4px_0px_0px_var(--fg-color)] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <h3 className="font-serif italic text-[10px] uppercase opacity-50">Allerte Mediche</h3>
-            <AlertCircle className={`w-4 h-4 ${sickAnimals > 0 ? 'text-red-400' : 'text-[#E4E3E0]'}`} />
+            <AlertCircle className={`w-4 h-4 ${sickAnimals > 0 ? 'text-red-400' : 'text-[var(--bg-color)]'}`} />
           </div>
           <div className="mt-4 flex items-baseline">
             <span className="text-3xl font-bold font-mono">{sickAnimals}</span>
@@ -237,25 +237,25 @@ export default function Dashboard({ user }: DashboardProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
          {/* Chart & Chart layout */}
          <div className="lg:col-span-2 space-y-6">
-            <h2 className="text-xl font-bold uppercase tracking-tighter border-b border-[#141414] pb-2">Analisi Peso Mandria</h2>
-            <div className="border border-[#141414] bg-white p-6 shadow-[4px_4px_0px_0px_#141414]">
+            <h2 className="text-xl font-bold uppercase tracking-tighter border-b border-[var(--fg-color)] pb-2">Analisi Peso Mandria</h2>
+            <div className="border border-[var(--fg-color)] bg-[var(--card-bg)] p-6 shadow-[4px_4px_0px_0px_var(--fg-color)]">
                {weightData.length === 0 ? (
-                  <div className="h-64 flex items-center justify-center text-xs font-mono opacity-50 uppercase tracking-widest border border-dashed border-[#141414]">Dati insufficienti</div>
+                  <div className="h-64 flex items-center justify-center text-xs font-mono opacity-50 uppercase tracking-widest border border-dashed border-[var(--fg-color)]">Dati insufficienti</div>
                ) : (
                   <div className="h-72 w-full font-mono text-xs">
                      <ResponsiveContainer width="100%" height={250}>
                         <AreaChart data={weightData} margin={{ top: 10, right: 10, bottom: 5, left: -20 }}>
                            <defs>
                               <linearGradient id="colorMedia" x1="0" y1="0" x2="0" y2="1">
-                                 <stop offset="5%" stopColor="#141414" stopOpacity={0.3}/>
-                                 <stop offset="95%" stopColor="#141414" stopOpacity={0}/>
+                                 <stop offset="5%" stopColor="var(--fg-color)" stopOpacity={0.3}/>
+                                 <stop offset="95%" stopColor="var(--fg-color)" stopOpacity={0}/>
                               </linearGradient>
                            </defs>
                            <CartesianGrid strokeDasharray="3 3" stroke="#D8D7D3" vertical={false} />
-                           <XAxis dataKey="month" stroke="#141414" fontSize={10} tickLine={false} axisLine={true} tickMargin={10} />
-                           <YAxis stroke="#141414" fontSize={10} tickLine={false} axisLine={true} tickMargin={10} unit="kg" />
-                           <Tooltip cursor={{ stroke: '#141414', strokeWidth: 1, strokeDasharray: '4 4' }} contentStyle={{ borderRadius: '0', border: '1px solid #141414', boxShadow: '4px 4px 0px 0px #141414', backgroundColor: '#fff', color: '#141414', fontFamily: 'monospace' }} />
-                           <Area type="monotone" dataKey="media" stroke="#141414" strokeWidth={2} fillOpacity={1} fill="url(#colorMedia)" activeDot={{ r: 6, fill: '#141414', stroke: '#E4E3E0', strokeWidth: 2 }} />
+                           <XAxis dataKey="month" stroke="var(--fg-color)" fontSize={10} tickLine={false} axisLine={true} tickMargin={10} />
+                           <YAxis stroke="var(--fg-color)" fontSize={10} tickLine={false} axisLine={true} tickMargin={10} unit="kg" />
+                           <Tooltip cursor={{ stroke: 'var(--fg-color)', strokeWidth: 1, strokeDasharray: '4 4' }} contentStyle={{ borderRadius: '0', border: '1px solid var(--fg-color)', boxShadow: '4px 4px 0px 0px var(--fg-color)', backgroundColor: '#fff', color: 'var(--fg-color)', fontFamily: 'monospace' }} />
+                           <Area type="monotone" dataKey="media" stroke="var(--fg-color)" strokeWidth={2} fillOpacity={1} fill="url(#colorMedia)" activeDot={{ r: 6, fill: 'var(--fg-color)', stroke: 'var(--bg-color)', strokeWidth: 2 }} />
                         </AreaChart>
                      </ResponsiveContainer>
                   </div>
@@ -266,8 +266,8 @@ export default function Dashboard({ user }: DashboardProps) {
          {/* Sidebar col */}
          <div className="space-y-8">
             <div>
-               <h2 className="text-xl font-bold uppercase tracking-tighter border-b border-[#141414] pb-2">Status Salute</h2>
-               <div className="border border-[#141414] bg-white shadow-[4px_4px_0px_0px_#141414] mt-6 p-4">
+               <h2 className="text-xl font-bold uppercase tracking-tighter border-b border-[var(--fg-color)] pb-2">Status Salute</h2>
+               <div className="border border-[var(--fg-color)] bg-[var(--card-bg)] shadow-[4px_4px_0px_0px_var(--fg-color)] mt-6 p-4">
                   {healthData.length === 0 ? (
                      <div className="py-10 text-center text-xs font-mono opacity-50">Nessun dato.</div>
                   ) : (
@@ -279,7 +279,7 @@ export default function Dashboard({ user }: DashboardProps) {
                                     <Cell key={`cell-${index}`} fill={entry.color} />
                                  ))}
                               </Pie>
-                              <Tooltip contentStyle={{ borderRadius: '0', border: '1px solid #141414', boxShadow: '2px 2px 0px 0px #141414', padding: '4px 8px' }} itemStyle={{ fontWeight: 'bold' }} />
+                              <Tooltip contentStyle={{ borderRadius: '0', border: '1px solid var(--fg-color)', boxShadow: '2px 2px 0px 0px var(--fg-color)', padding: '4px 8px' }} itemStyle={{ fontWeight: 'bold' }} />
                            </PieChart>
                         </ResponsiveContainer>
                      </div>
@@ -293,19 +293,19 @@ export default function Dashboard({ user }: DashboardProps) {
             </div>
 
             <div>
-               <h2 className="text-xl font-bold uppercase tracking-tighter border-b border-[#141414] pb-2">Nuovi Capi</h2>
-               <div className="border border-[#141414] bg-white shadow-[4px_4px_0px_0px_#141414] overflow-hidden mt-6">
+               <h2 className="text-xl font-bold uppercase tracking-tighter border-b border-[var(--fg-color)] pb-2">Nuovi Capi</h2>
+               <div className="border border-[var(--fg-color)] bg-[var(--card-bg)] shadow-[4px_4px_0px_0px_var(--fg-color)] overflow-hidden mt-6">
                {recentAdditions.length === 0 ? (
                   <div className="px-6 py-10 text-center text-xs font-mono opacity-50">
                      Nessun record in DB.
                   </div>
                ) : (
-                  <div className="divide-y divide-[#141414]">
+                  <div className="divide-y divide-[var(--fg-color)]">
                   {recentAdditions.map(animal => (
-                     <div key={animal.id} className="p-4 hover:bg-[#141414] hover:text-[#E4E3E0] group transition-colors">
+                     <div key={animal.id} className="p-4 hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] group transition-colors">
                         <div className="flex justify-between items-start mb-2">
                            <Link to={`/animal/${animal.id}`} className="font-mono font-bold text-lg tracking-tighter uppercase group-hover:underline">{animal.earTag}</Link>
-                           <span className="px-1.5 py-0.5 border border-[#141414] group-hover:border-[#E4E3E0] text-[9px] font-bold uppercase">
+                           <span className="px-1.5 py-0.5 border border-[var(--fg-color)] group-hover:border-[var(--bg-color)] text-[9px] font-bold uppercase">
                               {animal.healthStatus}
                            </span>
                         </div>
@@ -322,11 +322,11 @@ export default function Dashboard({ user }: DashboardProps) {
       {/* Floating Quick Actions Button */}
       <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
          <div className={`flex flex-col gap-2 mb-2 origin-bottom transition-all duration-200 ${quickActionMenuOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0 pointer-events-none'}`}>
-            <button onClick={() => { setQuickAction('animal'); setQuickActionMenuOpen(false); }} className="px-4 py-2 bg-white border border-[#141414] shadow-[2px_2px_0px_0px_#141414] text-[10px] font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] whitespace-nowrap cursor-pointer">Nuovo Capo</button>
-            <button onClick={() => { setQuickAction('weight'); setQuickActionMenuOpen(false); }} className="px-4 py-2 bg-white border border-[#141414] shadow-[2px_2px_0px_0px_#141414] text-[10px] font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] whitespace-nowrap cursor-pointer">Registra Peso</button>
-            <button onClick={() => { setQuickAction('feed'); setQuickActionMenuOpen(false); }} className="px-4 py-2 bg-white border border-[#141414] shadow-[2px_2px_0px_0px_#141414] text-[10px] font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] whitespace-nowrap cursor-pointer">Movimento Feed</button>
+            <button onClick={() => { setQuickAction('animal'); setQuickActionMenuOpen(false); }} className="px-4 py-2 bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] whitespace-nowrap cursor-pointer">Nuovo Capo</button>
+            <button onClick={() => { setQuickAction('weight'); setQuickActionMenuOpen(false); }} className="px-4 py-2 bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] whitespace-nowrap cursor-pointer">Registra Peso</button>
+            <button onClick={() => { setQuickAction('feed'); setQuickActionMenuOpen(false); }} className="px-4 py-2 bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] whitespace-nowrap cursor-pointer">Movimento Feed</button>
          </div>
-         <button onClick={() => setQuickActionMenuOpen(!quickActionMenuOpen)} className="w-14 h-14 bg-[#141414] text-[#E4E3E0] border border-[#141414] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] flex items-center justify-center hover:bg-[#E4E3E0] hover:text-[#141414] transition-colors rounded-full relative z-40 focus:outline-none cursor-pointer">
+         <button onClick={() => setQuickActionMenuOpen(!quickActionMenuOpen)} className="w-14 h-14 bg-[var(--fg-color)] text-[var(--bg-color)] border border-[var(--fg-color)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] flex items-center justify-center hover:bg-[var(--bg-color)] hover:text-[var(--fg-color)] transition-colors rounded-full relative z-40 focus:outline-none cursor-pointer">
             <div className={`text-2xl transition-transform ${quickActionMenuOpen ? 'rotate-45' : ''}`}>+</div>
          </button>
       </div>
@@ -335,8 +335,8 @@ export default function Dashboard({ user }: DashboardProps) {
       {quickAction !== 'none' && (
          <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex min-h-screen items-center justify-center p-4">
-               <div className="fixed inset-0 bg-[#141414]/50 backdrop-blur-sm" onClick={() => setQuickAction('none')}></div>
-               <div className="relative bg-white border border-[#141414] shadow-[8px_8px_0px_0px_#141414] w-full max-w-sm p-6">
+               <div className="fixed inset-0 bg-[var(--fg-color)]/50 backdrop-blur-sm" onClick={() => setQuickAction('none')}></div>
+               <div className="relative bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] w-full max-w-sm p-6">
                   <h3 className="text-xl font-bold tracking-tighter uppercase mb-4">
                      {quickAction === 'animal' && 'Registra Nuovo Capo'}
                      {quickAction === 'weight' && 'Registra Peso Rapido'}
@@ -347,15 +347,15 @@ export default function Dashboard({ user }: DashboardProps) {
                         <>
                            <div>
                               <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Orecchino *</label>
-                              <input required name="earTag" type="text" className="w-full border border-[#141414] bg-[#E4E3E0] py-2 px-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                              <input required name="earTag" type="text" className="w-full border border-[var(--fg-color)] bg-[var(--bg-color)] py-2 px-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                            </div>
                            <div>
                               <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Specie *</label>
-                              <input required name="species" type="text" defaultValue="Bovino" className="w-full border border-[#141414] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                              <input required name="species" type="text" defaultValue="Bovino" className="w-full border border-[var(--fg-color)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                            </div>
                            <div>
                               <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Data Nascita *</label>
-                              <input required name="dateOfBirth" type="date" defaultValue={new Date().toISOString().split('T')[0]} className="w-full border border-[#141414] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                              <input required name="dateOfBirth" type="date" defaultValue={new Date().toISOString().split('T')[0]} className="w-full border border-[var(--fg-color)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                            </div>
                         </>
                      )}
@@ -363,17 +363,17 @@ export default function Dashboard({ user }: DashboardProps) {
                         <>
                            <div>
                               <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Animale *</label>
-                              <select required name="animalId" className="w-full border border-[#141414] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414]">
+                              <select required name="animalId" className="w-full border border-[var(--fg-color)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]">
                                  {animals.map(a => <option key={a.id} value={a.id}>{a.earTag}</option>)}
                               </select>
                            </div>
                            <div>
                               <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Peso (kg) *</label>
-                              <input required name="weight" type="number" step="0.1" className="w-full border border-[#141414] bg-[#E4E3E0] py-2 px-3 text-lg font-mono focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                              <input required name="weight" type="number" step="0.1" className="w-full border border-[var(--fg-color)] bg-[var(--bg-color)] py-2 px-3 text-lg font-mono focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                            </div>
                            <div>
                               <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Data *</label>
-                              <input required name="date" type="date" defaultValue={new Date().toISOString().split('T')[0]} className="w-full border border-[#141414] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                              <input required name="date" type="date" defaultValue={new Date().toISOString().split('T')[0]} className="w-full border border-[var(--fg-color)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                            </div>
                         </>
                      )}
@@ -381,26 +381,26 @@ export default function Dashboard({ user }: DashboardProps) {
                         <>
                            <div>
                               <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Prodotto *</label>
-                              <select required name="stockId" className="w-full border border-[#141414] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414]">
+                              <select required name="stockId" className="w-full border border-[var(--fg-color)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]">
                                  {feedStocks.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
                               </select>
                            </div>
                            <div>
                               <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Tipo *</label>
-                              <select required name="type" className="w-full border border-[#141414] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414]">
+                              <select required name="type" className="w-full border border-[var(--fg-color)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]">
                                  <option value="in">Carico (Acquisto)</option>
                                  <option value="out">Scarico (Consumo)</option>
                               </select>
                            </div>
                            <div>
                               <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Quantità *</label>
-                              <input required name="amount" type="number" step="1" className="w-full border border-[#141414] bg-[#E4E3E0] py-2 px-3 text-lg font-mono focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                              <input required name="amount" type="number" step="1" className="w-full border border-[var(--fg-color)] bg-[var(--bg-color)] py-2 px-3 text-lg font-mono focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                            </div>
                         </>
                      )}
                      <div className="flex gap-2 pt-4">
-                        <button type="submit" className="flex-1 bg-[#141414] text-[#E4E3E0] border border-[#141414] shadow-[4px_4px_0px_0px_#141414] py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-[#E4E3E0] hover:text-[#141414] hover:shadow-none transition-all">Salva</button>
-                        <button type="button" onClick={() => setQuickAction('none')} className="bg-white border border-[#141414] py-2 px-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#E4E3E0] transition-colors">Annulla</button>
+                        <button type="submit" className="flex-1 bg-[var(--fg-color)] text-[var(--bg-color)] border border-[var(--fg-color)] shadow-[4px_4px_0px_0px_var(--fg-color)] py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--bg-color)] hover:text-[var(--fg-color)] hover:shadow-none transition-all">Salva</button>
+                        <button type="button" onClick={() => setQuickAction('none')} className="bg-[var(--card-bg)] border border-[var(--fg-color)] py-2 px-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--bg-color)] transition-colors">Annulla</button>
                      </div>
                   </form>
                </div>

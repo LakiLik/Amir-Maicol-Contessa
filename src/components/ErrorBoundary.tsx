@@ -31,15 +31,15 @@ class ErrorBoundary extends Component<Props, State> {
               <p className="mt-1 font-serif italic text-[11px] uppercase opacity-60">Impossibile caricare il modulo.</p>
             </div>
             
-            <div className="border border-[#141414] bg-white p-6 shadow-[4px_4px_0px_0px_#141414]">
+            <div className="border border-[var(--fg-color)] bg-[var(--card-bg)] p-6 shadow-[4px_4px_0px_0px_var(--fg-color)]">
                 <h3 className="font-bold tracking-widest text-[#DC2626] uppercase text-xs mb-2">Dettagli Errore:</h3>
-                <pre className="text-[10px] font-mono whitespace-pre-wrap opacity-80 bg-[#141414] text-[#E4E3E0] p-4 border border-[#141414]">
+                <pre className="text-[10px] font-mono whitespace-pre-wrap opacity-80 bg-[var(--fg-color)] text-[var(--bg-color)] p-4 border border-[var(--fg-color)]">
                    {this.state.error?.toString()}
                 </pre>
                 <div className="mt-6">
                     <button 
                        onClick={() => (this as any).setState({ hasError: false })}
-                       className="px-4 py-2 bg-[#141414] text-[#E4E3E0] text-[10px] uppercase font-bold tracking-widest hover:bg-[#E4E3E0] hover:text-[#141414] transition-colors border border-[#141414]"
+                       className="px-4 py-2 bg-[var(--fg-color)] text-[var(--bg-color)] text-[10px] uppercase font-bold tracking-widest hover:bg-[var(--bg-color)] hover:text-[var(--fg-color)] transition-colors border border-[var(--fg-color)]"
                     >
                         Riprova
                     </button>

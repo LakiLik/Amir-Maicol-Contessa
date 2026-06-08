@@ -88,7 +88,7 @@ export default function MapArea({ user }: MapAreaProps) {
   if (!hasValidKey) {
     return (
       <div className="flex items-center justify-center h-full p-8">
-        <div className="max-w-xl text-center border p-8 bg-white border-[#141414] shadow-[8px_8px_0px_0px_#141414]">
+        <div className="max-w-xl text-center border p-8 bg-[var(--card-bg)] border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)]">
           <h2 className="text-2xl font-bold uppercase tracking-tighter mb-4">Chiave Google Maps Richiesta</h2>
           <p className="text-sm font-serif italic mb-6">Per utilizzare la funzionalità mappa e geofencing è necessaria una chiave API.</p>
           <ul className="text-left text-sm space-y-2 mb-6 ml-6 list-disc">
@@ -156,13 +156,13 @@ export default function MapArea({ user }: MapAreaProps) {
            )}
            <button 
               onClick={simulateScattering}
-              className={`text-[10px] border border-[#141414] bg-white px-3 py-2 font-bold uppercase tracking-widest transition-colors flex items-center gap-2 hover:bg-[#E4E3E0]`}
+              className={`text-[10px] border border-[var(--fg-color)] bg-[var(--card-bg)] px-3 py-2 font-bold uppercase tracking-widest transition-colors flex items-center gap-2 hover:bg-[var(--bg-color)]`}
            >
               Simula GPS GPS
            </button>
            <button type="button"
               onClick={() => setMode(mode === 'view' ? 'draw_circle' : 'view')}
-              className={`text-xs border border-[#141414] px-4 py-3 font-bold uppercase tracking-widest transition-colors flex items-center gap-2 shadow-[2px_2px_0px_0px_#141414] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none cursor-pointer ${mode === 'draw_circle' ? 'bg-[#141414] text-[#E4E3E0]' : 'bg-white hover:bg-[#E4E3E0]'}`}
+              className={`text-xs border border-[var(--fg-color)] px-4 py-3 font-bold uppercase tracking-widest transition-colors flex items-center gap-2 shadow-[2px_2px_0px_0px_var(--fg-color)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none cursor-pointer ${mode === 'draw_circle' ? 'bg-[var(--fg-color)] text-[var(--bg-color)]' : 'bg-[var(--card-bg)] hover:bg-[var(--bg-color)]'}`}
            >
               <Plus size={14} />
               {mode === 'draw_circle' ? 'Annulla Inserimento' : 'Nuova Geo-Zona'}
@@ -170,16 +170,16 @@ export default function MapArea({ user }: MapAreaProps) {
         </div>
       </div>
       
-      <div className="flex-1 border border-[#141414] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-[#E4E3E0] relative flex">
+      <div className="flex-1 border border-[var(--fg-color)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-[var(--bg-color)] relative flex">
          
-         <div className="w-64 bg-white border-r border-[#141414] flex flex-col hidden md:flex">
-             <div className="p-4 border-b border-[#141414]">
+         <div className="w-64 bg-[var(--card-bg)] border-r border-[var(--fg-color)] flex flex-col hidden md:flex">
+             <div className="p-4 border-b border-[var(--fg-color)]">
                 <h3 className="font-bold uppercase tracking-widest text-xs mb-1">Geo-Zone ({geozones.length})</h3>
                 <p className="text-[10px] font-sans opacity-60">Aree operative impostate</p>
              </div>
-             <div className="flex-1 overflow-auto divide-y divide-[#141414]">
+             <div className="flex-1 overflow-auto divide-y divide-[var(--fg-color)]">
                 {geozones.map(zone => (
-                   <div key={zone.id} className="p-4 flex items-center justify-between hover:bg-[#E4E3E0] transition-colors group">
+                   <div key={zone.id} className="p-4 flex items-center justify-between hover:bg-[var(--bg-color)] transition-colors group">
                       <div>
                          <div className="font-bold text-xs uppercase">{zone.name}</div>
                          {zone.type === 'circle' && <div className="text-[10px] opacity-70 font-mono mt-1">Raggio: {zone.radius}m</div>}
@@ -215,7 +215,7 @@ export default function MapArea({ user }: MapAreaProps) {
                   {geozones.map(zone => zone.type === 'circle' && zone.center ? (
                      <AdvancedMarker key={'zone-'+zone.id} position={zone.center} zIndex={10}>
                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-green-500/20 border-2 border-green-500 rounded-full flex items-center justify-center pointer-events-none" style={{ width: zone.radius! * 2, height: zone.radius! * 2, minWidth: '100px', minHeight: '100px' }}>
-                           <span className="text-[10px] font-bold text-green-800 bg-white/70 px-1">{zone.name}</span>
+                           <span className="text-[10px] font-bold text-green-800 bg-[var(--card-bg)]/70 px-1">{zone.name}</span>
                          </div>
                      </AdvancedMarker>
                   ) : null)}
@@ -224,7 +224,7 @@ export default function MapArea({ user }: MapAreaProps) {
                      const isOut = animalsOutOfBounds.some(a => a.id === animal.id);
                      return (
                         <AdvancedMarker key={animal.id} position={animal.lastLocation!} title={animal.earTag + (animal.name ? ` (${animal.name})` : '')} zIndex={20}>
-                           <Pin background={isOut ? '#EF4444' : '#141414'} borderColor={isOut ? '#7F1D1D' : '#000'} glyphColor="#fff">
+                           <Pin background={isOut ? '#EF4444' : 'var(--fg-color)'} borderColor={isOut ? '#7F1D1D' : '#000'} glyphColor="#fff">
                               <span className="text-[10px] font-bold flex items-center justify-center w-full h-full">{animal.earTag.substring(0,3)}</span>
                            </Pin>
                         </AdvancedMarker>
@@ -234,7 +234,7 @@ export default function MapArea({ user }: MapAreaProps) {
             </APIProvider>
             
             {mode === 'draw_circle' && (
-               <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#141414] text-white px-4 py-2 font-bold uppercase tracking-widest text-[10px] shadow-lg pointer-events-none z-10 animate-pulse">
+               <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-[var(--fg-color)] text-white px-4 py-2 font-bold uppercase tracking-widest text-[10px] shadow-lg pointer-events-none z-10 animate-pulse">
                   Clicca sulla mappa per posizionare il centro della zona
                </div>
             )}

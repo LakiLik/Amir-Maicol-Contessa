@@ -76,15 +76,15 @@ export default function FamilyTree({ currentAnimalId, userId }: FamilyTreeProps)
   );
 
   return (
-    <div className="bg-white border border-[#141414] p-8 shadow-[4px_4px_0px_0px_#141414] relative">
+    <div className="bg-[var(--card-bg)] border border-[var(--fg-color)] p-8 shadow-[4px_4px_0px_0px_var(--fg-color)] relative">
       <div className="flex flex-col items-center">
         {/* Parents Row */}
         <div className="flex justify-center gap-4 md:gap-16 mb-12 relative w-full">
           <div className="text-center flex-1 max-w-[200px]">
-            <h3 className="text-[10px] font-bold text-[#141414] uppercase tracking-widest mb-3 opacity-70">Madre</h3>
+            <h3 className="text-[10px] font-bold text-[var(--fg-color)] uppercase tracking-widest mb-3 opacity-70">Madre</h3>
             {mother ? (
               <div className="relative group">
-                 <Link to={`/animal/${mother.id}`} className="block p-4 border border-[#141414] bg-[#E4E3E0]/30 hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] hover:shadow-none">
+                 <Link to={`/animal/${mother.id}`} className="block p-4 border border-[var(--fg-color)] bg-[var(--bg-color)]/30 hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] hover:shadow-none">
                    <p className="font-mono font-bold text-lg">{mother.earTag}</p>
                    <p className="text-[10px] uppercase font-serif italic opacity-70 mt-1">{mother.name || '-'}</p>
                  </Link>
@@ -93,7 +93,7 @@ export default function FamilyTree({ currentAnimalId, userId }: FamilyTreeProps)
                  </button>
               </div>
             ) : (
-               <button onClick={() => setIsLinking('mother')} className="w-full p-4 flex flex-col items-center justify-center border border-[#141414] border-dashed text-[#141414]/60 hover:bg-[#141414] hover:text-[#E4E3E0] hover:border-solid transition-colors gap-2">
+               <button onClick={() => setIsLinking('mother')} className="w-full p-4 flex flex-col items-center justify-center border border-[var(--fg-color)] border-dashed text-[var(--fg-color)]/60 hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] hover:border-solid transition-colors gap-2">
                   <Plus size={20} />
                   <span className="font-mono text-xs uppercase font-bold tracking-widest">Aggiungi</span>
                </button>
@@ -101,10 +101,10 @@ export default function FamilyTree({ currentAnimalId, userId }: FamilyTreeProps)
           </div>
           
           <div className="text-center flex-1 max-w-[200px]">
-             <h3 className="text-[10px] font-bold text-[#141414] uppercase tracking-widest mb-3 opacity-70">Padre</h3>
+             <h3 className="text-[10px] font-bold text-[var(--fg-color)] uppercase tracking-widest mb-3 opacity-70">Padre</h3>
              {father ? (
                 <div className="relative group">
-                   <Link to={`/animal/${father.id}`} className="block p-4 border border-[#141414] bg-[#E4E3E0]/30 hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] hover:shadow-none">
+                   <Link to={`/animal/${father.id}`} className="block p-4 border border-[var(--fg-color)] bg-[var(--bg-color)]/30 hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] hover:shadow-none">
                      <p className="font-mono font-bold text-lg">{father.earTag}</p>
                      <p className="text-[10px] uppercase font-serif italic opacity-70 mt-1">{father.name || '-'}</p>
                    </Link>
@@ -113,7 +113,7 @@ export default function FamilyTree({ currentAnimalId, userId }: FamilyTreeProps)
                    </button>
                 </div>
               ) : (
-                 <button onClick={() => setIsLinking('father')} className="w-full p-4 flex flex-col items-center justify-center border border-[#141414] border-dashed text-[#141414]/60 hover:bg-[#141414] hover:text-[#E4E3E0] hover:border-solid transition-colors gap-2">
+                 <button onClick={() => setIsLinking('father')} className="w-full p-4 flex flex-col items-center justify-center border border-[var(--fg-color)] border-dashed text-[var(--fg-color)]/60 hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] hover:border-solid transition-colors gap-2">
                     <Plus size={20} />
                     <span className="font-mono text-xs uppercase font-bold tracking-widest">Aggiungi</span>
                  </button>
@@ -122,8 +122,8 @@ export default function FamilyTree({ currentAnimalId, userId }: FamilyTreeProps)
         </div>
 
         {/* Current Animal */}
-        <div className="relative mb-12 pt-8 border-t border-[#141414] w-1/2 flex justify-center">
-          <div className="absolute top-0 left-1/2 w-px h-8 bg-[#141414]"></div>
+        <div className="relative mb-12 pt-8 border-t border-[var(--fg-color)] w-1/2 flex justify-center">
+          <div className="absolute top-0 left-1/2 w-px h-8 bg-[var(--fg-color)]"></div>
           <div className="text-center z-10 w-full max-w-[240px]">
             <div className="block p-5 border border-red-600 bg-red-600 text-white shadow-[4px_4px_0px_0px_rgba(220,38,38,0.3)] rounded-sm relative">
                <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Target</p>
@@ -133,14 +133,14 @@ export default function FamilyTree({ currentAnimalId, userId }: FamilyTreeProps)
         </div>
 
         {/* Children */}
-        <div className="relative pt-12 border-t border-[#141414] w-full max-w-4xl flex flex-col items-center">
-          <div className="absolute top-0 left-1/2 w-px h-12 bg-[#141414]"></div>
-          <h3 className="text-[10px] font-bold text-[#141414] uppercase tracking-widest mb-8 absolute -top-10 left-1/2 -ml-6 bg-white px-3 py-1 border border-[#141414]">Generazione F1</h3>
+        <div className="relative pt-12 border-t border-[var(--fg-color)] w-full max-w-4xl flex flex-col items-center">
+          <div className="absolute top-0 left-1/2 w-px h-12 bg-[var(--fg-color)]"></div>
+          <h3 className="text-[10px] font-bold text-[var(--fg-color)] uppercase tracking-widest mb-8 absolute -top-10 left-1/2 -ml-6 bg-[var(--card-bg)] px-3 py-1 border border-[var(--fg-color)]">Generazione F1</h3>
           
           <div className="flex flex-wrap justify-center gap-6 w-full px-4">
              {children.map(child => (
                  <div key={child.id} className="relative group min-w-[140px]">
-                   <Link to={`/animal/${child.id}`} className="block p-4 border border-[#141414] bg-white hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] hover:shadow-none">
+                   <Link to={`/animal/${child.id}`} className="block p-4 border border-[var(--fg-color)] bg-[var(--card-bg)] hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] hover:shadow-none">
                      <p className="font-mono font-bold text-lg text-center">{child.earTag}</p>
                      <p className="text-[10px] uppercase font-serif italic text-center opacity-70 mt-1">{child.name || '-'}</p>
                    </Link>
@@ -149,7 +149,7 @@ export default function FamilyTree({ currentAnimalId, userId }: FamilyTreeProps)
                    </button>
                  </div>
              ))}
-             <button onClick={() => setIsLinking('child')} className="block min-w-[140px] p-4 flex flex-col items-center justify-center border border-[#141414] border-dashed text-[#141414]/60 hover:bg-[#141414] hover:text-[#E4E3E0] hover:border-solid transition-colors gap-2">
+             <button onClick={() => setIsLinking('child')} className="block min-w-[140px] p-4 flex flex-col items-center justify-center border border-[var(--fg-color)] border-dashed text-[var(--fg-color)]/60 hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] hover:border-solid transition-colors gap-2">
                 <Plus size={20} />
                 <span className="font-mono text-xs uppercase font-bold tracking-widest">Aggiungi</span>
              </button>
@@ -160,8 +160,8 @@ export default function FamilyTree({ currentAnimalId, userId }: FamilyTreeProps)
       {/* Link Modal */}
       {isLinking && (
          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-[#141414]/50 backdrop-blur-sm" onClick={() => { setIsLinking(null); setSearchQuery(''); }}></div>
-            <div className="bg-white border border-[#141414] shadow-[8px_8px_0px_0px_#141414] p-6 max-w-lg w-full relative z-10 max-h-[80vh] flex flex-col">
+            <div className="absolute inset-0 bg-[var(--fg-color)]/50 backdrop-blur-sm" onClick={() => { setIsLinking(null); setSearchQuery(''); }}></div>
+            <div className="bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] p-6 max-w-lg w-full relative z-10 max-h-[80vh] flex flex-col">
                <h3 className="text-xl font-bold uppercase tracking-tighter mb-1">
                   Collega {isLinking === 'mother' ? 'Madre' : isLinking === 'father' ? 'Padre' : 'Figlio'}
                </h3>
@@ -173,20 +173,20 @@ export default function FamilyTree({ currentAnimalId, userId }: FamilyTreeProps)
                      autoFocus
                      type="text" 
                      placeholder="Cerca per orecchino o nome..." 
-                     className="w-full border border-[#141414] py-2 pl-10 pr-4 font-mono text-sm focus:outline-none focus:ring-1 focus:ring-[#141414]"
+                     className="w-full border border-[var(--fg-color)] py-2 pl-10 pr-4 font-mono text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]"
                      value={searchQuery}
                      onChange={e => setSearchQuery(e.target.value)}
                   />
                </div>
 
-               <div className="overflow-y-auto flex-1 border border-[#141414] min-h-[200px]">
+               <div className="overflow-y-auto flex-1 border border-[var(--fg-color)] min-h-[200px]">
                  {filteredAnimals.length === 0 ? (
                     <div className="p-8 text-center text-[10px] font-mono uppercase opacity-50">Nessun animale trovato</div>
                  ) : (
-                    <ul className="divide-y divide-[#141414]">
+                    <ul className="divide-y divide-[var(--fg-color)]">
                       {filteredAnimals.map(a => (
                          <li key={a.id}>
-                            <button onClick={() => handleLink(a.id)} className="w-full flex items-center justify-between p-3 hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors text-left group">
+                            <button onClick={() => handleLink(a.id)} className="w-full flex items-center justify-between p-3 hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors text-left group">
                                <div>
                                   <p className="font-mono font-bold">{a.earTag}</p>
                                   <p className="text-[10px] uppercase font-serif opacity-70">{a.name} | {a.gender}</p>
@@ -199,7 +199,7 @@ export default function FamilyTree({ currentAnimalId, userId }: FamilyTreeProps)
                  )}
                </div>
                
-               <button onClick={() => { setIsLinking(null); setSearchQuery(''); }} className="mt-6 border border-[#141414] py-2 uppercase text-[10px] font-bold tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors">
+               <button onClick={() => { setIsLinking(null); setSearchQuery(''); }} className="mt-6 border border-[var(--fg-color)] py-2 uppercase text-[10px] font-bold tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors">
                  Annulla
                </button>
             </div>

@@ -216,19 +216,19 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
         </div>
         <div className="flex items-center space-x-2 flex-wrap gap-y-2">
           <input type="file" accept=".xlsx, .xls, .csv" hidden ref={fileInputRef} onChange={handleImportXLSX} />
-          <button onClick={() => fileInputRef.current?.click()} className="text-xs border border-[#141414] bg-white px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] flex items-center">
+          <button onClick={() => fileInputRef.current?.click()} className="text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] flex items-center">
             <Upload size={14} className="mr-1" /> Import XLSX/CSV
           </button>
-          <button onClick={exportXLSX} className="text-xs border border-[#141414] bg-white px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+          <button onClick={exportXLSX} className="text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
             Exp XLSX
           </button>
-          <button onClick={exportCSV} className="text-xs border border-[#141414] bg-white px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+          <button onClick={exportCSV} className="text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
             Exp CSV
           </button>
-          <button onClick={() => setIsPdfModalOpen(true)} className="text-xs border border-[#141414] bg-white px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
+          <button onClick={() => setIsPdfModalOpen(true)} className="text-xs border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]">
             Exp PDF
           </button>
-          <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center text-xs border border-[#141414] bg-[#141414] text-[#E4E3E0] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[#E4E3E0] hover:text-[#141414] transition-colors shadow-[2px_2px_0px_0px_#141414] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
+          <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center text-xs border border-[var(--fg-color)] bg-[var(--fg-color)] text-[var(--bg-color)] px-4 py-3 font-bold uppercase tracking-widest hover:bg-[var(--bg-color)] hover:text-[var(--fg-color)] transition-colors shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] cursor-pointer">
             <Plus size={14} className="mr-1" />
             Nuovo Capo
           </button>
@@ -241,7 +241,7 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
         </div>
         <input
           type="text"
-          className="block w-full border border-[#141414] bg-white py-2.5 pl-10 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[#141414] shadow-[4px_4px_0px_0px_#141414]"
+          className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2.5 pl-10 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] shadow-[4px_4px_0px_0px_var(--fg-color)]"
           placeholder="CERCA ORECCHINO/NOME..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -249,8 +249,8 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
       </div>
 
       {/* Grid */}
-      <div className="border border-[#141414] bg-transparent overflow-hidden overflow-x-auto shadow-[4px_4px_0px_0px_#141414]">
-        <table className="min-w-full divide-y-2 divide-[#141414]">
+      <div className="border border-[var(--fg-color)] bg-transparent overflow-hidden overflow-x-auto shadow-[4px_4px_0px_0px_var(--fg-color)]">
+        <table className="min-w-full divide-y-2 divide-[var(--fg-color)]">
           <thead className="bg-[#D8D7D3]">
             <tr>
               <th scope="col" className="px-6 py-3 text-left font-serif italic text-[11px] uppercase tracking-wider opacity-70">Orecchino / Nome</th>
@@ -260,20 +260,20 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
               <th scope="col" className="relative px-6 py-3 text-right font-serif italic text-[11px] uppercase tracking-wider opacity-70">Azioni</th>
             </tr>
           </thead>
-          <tbody className="bg-transparent divide-y divide-[#141414]">
+          <tbody className="bg-transparent divide-y divide-[var(--fg-color)]">
             {loading ? (
-               <tr><td colSpan={5} className="px-6 py-8 text-center text-[10px] font-mono uppercase tracking-widest border-b border-[#141414]">Lettura archivi...</td></tr>
+               <tr><td colSpan={5} className="px-6 py-8 text-center text-[10px] font-mono uppercase tracking-widest border-b border-[var(--fg-color)]">Lettura archivi...</td></tr>
             ) : filteredAnimals.length === 0 ? (
-              <tr><td colSpan={5} className="px-6 py-12 text-center text-xs font-mono opacity-50 border-b border-[#141414]">Nessun record presente in DB.</td></tr>
+              <tr><td colSpan={5} className="px-6 py-12 text-center text-xs font-mono opacity-50 border-b border-[var(--fg-color)]">Nessun record presente in DB.</td></tr>
             ) : (
               filteredAnimals.map((animal) => (
-                <tr key={animal.id} className="hover:bg-[#141414] hover:text-[#E4E3E0] group cursor-pointer transition-colors bg-white">
+                <tr key={animal.id} className="hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] group cursor-pointer transition-colors bg-[var(--card-bg)]">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       {animal.photoUrl ? (
-                         <img src={animal.photoUrl} alt="" className="w-10 h-10 border border-[#141414] object-cover grayscale group-hover:grayscale-0 transition-all" />
+                         <img src={animal.photoUrl} alt="" className="w-10 h-10 border border-[var(--fg-color)] object-cover grayscale group-hover:grayscale-0 transition-all" />
                       ) : (
-                         <div className="w-10 h-10 bg-[#E4E3E0] border border-[#141414] flex items-center justify-center font-mono text-xs text-[#141414] font-bold group-hover:bg-white transition-colors">
+                         <div className="w-10 h-10 bg-[var(--bg-color)] border border-[var(--fg-color)] flex items-center justify-center font-mono text-xs text-[var(--fg-color)] font-bold group-hover:bg-[var(--card-bg)] transition-colors">
                            {animal.species?.[0]?.toUpperCase() || '-'}
                          </div>
                       )}
@@ -284,14 +284,14 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-[11px] font-bold uppercase tracking-wider border border-transparent group-hover:border-[#E4E3E0]/20 inline-block px-1">{animal.species}</div>
+                    <div className="text-[11px] font-bold uppercase tracking-wider border border-transparent group-hover:border-[var(--bg-color)]/20 inline-block px-1">{animal.species}</div>
                     <div className="text-[10px] font-serif italic opacity-60 mt-1">{animal.breed || 'Razza ND'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2 py-0.5 border border-[#141414] text-[9px] font-bold uppercase
+                    <span className={`inline-flex items-center px-2 py-0.5 border border-[var(--fg-color)] text-[9px] font-bold uppercase
                       ${animal.healthStatus?.toLowerCase() === 'sano' || animal.healthStatus?.toLowerCase() === 'healthy' 
-                        ? 'bg-green-200 text-[#141414] group-hover:bg-green-600' 
-                        : 'bg-red-200 text-[#141414] group-hover:bg-red-600'
+                        ? 'bg-green-200 text-[var(--fg-color)] group-hover:bg-green-600' 
+                        : 'bg-red-200 text-[var(--fg-color)] group-hover:bg-red-600'
                       } transition-colors
                     `}>
                       {animal.healthStatus}
@@ -301,9 +301,9 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                     {animal.dateOfBirth.split('-').reverse().join('/')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-[10px] uppercase font-bold tracking-widest gap-2 flex justify-end">
-                    <Link to={`/animal/${animal.id}`} className="border border-[#141414] text-[#141414] bg-white group-hover:bg-transparent group-hover:border-[#E4E3E0] group-hover:text-[#E4E3E0] px-3 py-1.5 transition-colors">Dettagli</Link>
-                    <button onClick={() => { setEditingAnimal(animal); setIsModalOpen(true); }} className="border border-[#141414] text-[#141414] bg-white group-hover:bg-transparent group-hover:border-[#E4E3E0] group-hover:text-[#E4E3E0] px-3 py-1.5 transition-colors">Modifica</button>
-                    <button onClick={() => confirm('Sei sicuro?') && deleteAnimal(animal.id)} className="border border-[#141414] text-[#141414] bg-red-200 group-hover:bg-red-600 group-hover:text-white group-hover:border-transparent px-3 py-1.5 transition-colors">Elimina</button>
+                    <Link to={`/animal/${animal.id}`} className="border border-[var(--fg-color)] text-[var(--fg-color)] bg-[var(--card-bg)] group-hover:bg-transparent group-hover:border-[var(--bg-color)] group-hover:text-[var(--bg-color)] px-3 py-1.5 transition-colors">Dettagli</Link>
+                    <button onClick={() => { setEditingAnimal(animal); setIsModalOpen(true); }} className="border border-[var(--fg-color)] text-[var(--fg-color)] bg-[var(--card-bg)] group-hover:bg-transparent group-hover:border-[var(--bg-color)] group-hover:text-[var(--bg-color)] px-3 py-1.5 transition-colors">Modifica</button>
+                    <button onClick={() => confirm('Sei sicuro?') && deleteAnimal(animal.id)} className="border border-[var(--fg-color)] text-[var(--fg-color)] bg-red-200 group-hover:bg-red-600 group-hover:text-white group-hover:border-transparent px-3 py-1.5 transition-colors">Elimina</button>
                   </td>
                 </tr>
               ))
@@ -316,40 +316,40 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
       {isModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center p-4 text-center">
-            <div className="fixed inset-0 transition-opacity bg-[#141414]/50 backdrop-blur-sm" onClick={closeModal}></div>
-            <div className="relative inline-block align-bottom bg-white border border-[#141414] shadow-[8px_8px_0px_0px_#141414] text-left transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+            <div className="fixed inset-0 transition-opacity bg-[var(--fg-color)]/50 backdrop-blur-sm" onClick={closeModal}></div>
+            <div className="relative inline-block align-bottom bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] text-left transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
               <form onSubmit={handleSave}>
                 <div className="p-8">
                   <h3 className="text-2xl font-bold tracking-tighter uppercase mb-2">
                     {editingAnimal ? 'Edita Dati Capo' : 'Registra Nuovo Capo'}
                   </h3>
-                  <p className="font-serif italic text-[11px] uppercase opacity-60 mb-6 border-b border-[#141414] pb-4">Inserimento manuale database</p>
+                  <p className="font-serif italic text-[11px] uppercase opacity-60 mb-6 border-b border-[var(--fg-color)] pb-4">Inserimento manuale database</p>
                   
                   <div className="grid grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-x-4">
                     <div className="col-span-2 sm:col-span-1">
                       <div className="flex justify-between items-end mb-1">
                         <label className="block text-[10px] font-bold uppercase tracking-widest opacity-70">Orecchino *</label>
                         <div className="flex items-center space-x-1">
-                           <button type="button" onClick={() => setIsQRScannerOpen(true)} className="text-[9px] flex items-center gap-1 font-bold uppercase border border-[#141414] px-2 py-0.5 hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors">
+                           <button type="button" onClick={() => setIsQRScannerOpen(true)} className="text-[9px] flex items-center gap-1 font-bold uppercase border border-[var(--fg-color)] px-2 py-0.5 hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors">
                               <QrCode size={10} /> Scan QR
                            </button>
                            <div className="relative">
                               <input type="file" accept="image/*" capture="environment" onChange={handleScanEarTag} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                              <button type="button" disabled={isScanning} className="text-[9px] flex items-center gap-1 font-bold uppercase border border-[#141414] px-2 py-0.5 hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors disabled:opacity-50">
+                              <button type="button" disabled={isScanning} className="text-[9px] flex items-center gap-1 font-bold uppercase border border-[var(--fg-color)] px-2 py-0.5 hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors disabled:opacity-50">
                                  {isScanning ? <Loader2 size={10} className="animate-spin" /> : <Camera size={10} />} OCR Foto
                               </button>
                            </div>
                         </div>
                       </div>
-                      <input required ref={earTagRef} type="text" name="earTag" defaultValue={editingAnimal?.earTag} className="block w-full border border-[#141414] bg-[#E4E3E0] py-2 px-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                      <input required ref={earTagRef} type="text" name="earTag" defaultValue={editingAnimal?.earTag} className="block w-full border border-[var(--fg-color)] bg-[var(--bg-color)] py-2 px-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                     </div>
                     <div className="col-span-2 sm:col-span-1">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Nome</label>
-                      <input type="text" name="name" defaultValue={editingAnimal?.name} className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                      <input type="text" name="name" defaultValue={editingAnimal?.name} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                     </div>
                     <div className="col-span-2 sm:col-span-1">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Specie *</label>
-                      <select required name="species" defaultValue={editingAnimal?.species || 'mucca'} className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[#141414] font-mono">
+                      <select required name="species" defaultValue={editingAnimal?.species || 'mucca'} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
                         <option value="mucca">Mucca</option>
                         <option value="toro">Toro</option>
                         <option value="vitello">Vitello/a</option>
@@ -358,18 +358,18 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                     </div>
                     <div className="col-span-2 sm:col-span-1">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Sesso</label>
-                      <select name="gender" defaultValue={editingAnimal?.gender || 'F'} className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[#141414] font-mono">
+                      <select name="gender" defaultValue={editingAnimal?.gender || 'F'} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
                         <option value="F">Femmina</option>
                         <option value="M">Maschio</option>
                       </select>
                     </div>
                     <div className="col-span-2 sm:col-span-1">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Data di Nascita *</label>
-                      <input required type="date" name="dateOfBirth" defaultValue={editingAnimal?.dateOfBirth} className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm font-mono uppercase focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                      <input required type="date" name="dateOfBirth" defaultValue={editingAnimal?.dateOfBirth} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm font-mono uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                     </div>
                     <div className="col-span-2 sm:col-span-1">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Stato Salute *</label>
-                      <select required name="healthStatus" defaultValue={editingAnimal?.healthStatus || 'Sano'} className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[#141414] font-mono">
+                      <select required name="healthStatus" defaultValue={editingAnimal?.healthStatus || 'Sano'} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
                         <option value="Sano">Sano</option>
                         <option value="Malato">Malato</option>
                         <option value="In Osservazione">In Osservazione</option>
@@ -377,11 +377,11 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                     </div>
                     <div className="col-span-2">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Razza</label>
-                      <input type="text" name="breed" defaultValue={editingAnimal?.breed} className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                      <input type="text" name="breed" defaultValue={editingAnimal?.breed} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                     </div>
                     <div className="col-span-2 sm:col-span-1">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Madre (Opzionale)</label>
-                      <select name="motherId" defaultValue={editingAnimal?.motherId || ''} className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414] font-mono">
+                      <select name="motherId" defaultValue={editingAnimal?.motherId || ''} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
                         <option value="">-- Seleziona --</option>
                         {animals.filter(a => a.gender === 'F' && a.id !== editingAnimal?.id).map(a => (
                           <option key={a.id} value={a.id}>{a.earTag} {a.name ? `(${a.name})` : ''}</option>
@@ -390,7 +390,7 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                     </div>
                     <div className="col-span-2 sm:col-span-1">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">Padre (Opzionale)</label>
-                      <select name="fatherId" defaultValue={editingAnimal?.fatherId || ''} className="block w-full border border-[#141414] bg-white py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#141414] font-mono">
+                      <select name="fatherId" defaultValue={editingAnimal?.fatherId || ''} className="block w-full border border-[var(--fg-color)] bg-[var(--card-bg)] py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)] font-mono">
                         <option value="">-- Seleziona --</option>
                         {animals.filter(a => a.gender === 'M' && a.id !== editingAnimal?.id).map(a => (
                           <option key={a.id} value={a.id}>{a.earTag} {a.name ? `(${a.name})` : ''}</option>
@@ -399,15 +399,15 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                     </div>
                     <div className="col-span-2">
                       <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">URL Foto (CDN)</label>
-                      <input type="url" name="photoUrl" defaultValue={editingAnimal?.photoUrl} placeholder="https://..." className="block w-full border border-[#141414] bg-[#E4E3E0]/30 py-2 px-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[#141414]" />
+                      <input type="url" name="photoUrl" defaultValue={editingAnimal?.photoUrl} placeholder="https://..." className="block w-full border border-[var(--fg-color)] bg-[var(--bg-color)]/30 py-2 px-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[var(--fg-color)]" />
                     </div>
                   </div>
                 </div>
-                <div className="bg-[#E4E3E0] px-8 py-4 sm:flex sm:flex-row-reverse border-t border-[#141414] gap-3">
-                  <button type="submit" className="w-full inline-flex justify-center border border-transparent bg-[#141414] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#E4E3E0] shadow-[2px_2px_0px_0px_#141414] hover:bg-white hover:border-[#141414] hover:text-[#141414] focus:outline-none focus:ring-0 active:shadow-none active:translate-y-[2px] active:translate-x-[2px] sm:w-auto">
+                <div className="bg-[var(--bg-color)] px-8 py-4 sm:flex sm:flex-row-reverse border-t border-[var(--fg-color)] gap-3">
+                  <button type="submit" className="w-full inline-flex justify-center border border-transparent bg-[var(--fg-color)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] hover:bg-[var(--card-bg)] hover:border-[var(--fg-color)] hover:text-[var(--fg-color)] focus:outline-none focus:ring-0 active:shadow-none active:translate-y-[2px] active:translate-x-[2px] sm:w-auto">
                     {editingAnimal ? 'Applica Modifiche' : 'Registra Form'}
                   </button>
-                  <button type="button" onClick={closeModal} className="mt-3 w-full inline-flex justify-center border border-[#141414] bg-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#141414] shadow-[2px_2px_0px_0px_#141414] hover:bg-[#E4E3E0] focus:outline-none focus:ring-0 active:shadow-none active:translate-y-[2px] active:translate-x-[2px] sm:mt-0 sm:w-auto">
+                  <button type="button" onClick={closeModal} className="mt-3 w-full inline-flex justify-center border border-[var(--fg-color)] bg-[var(--card-bg)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--fg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] hover:bg-[var(--bg-color)] focus:outline-none focus:ring-0 active:shadow-none active:translate-y-[2px] active:translate-x-[2px] sm:mt-0 sm:w-auto">
                     Annulla
                   </button>
                 </div>
@@ -421,20 +421,20 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
       {isPdfModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center p-4 text-center">
-            <div className="fixed inset-0 transition-opacity bg-[#141414]/50 backdrop-blur-sm" onClick={() => setIsPdfModalOpen(false)}></div>
-            <div className="relative inline-block align-bottom bg-white border border-[#141414] shadow-[8px_8px_0px_0px_#141414] text-left transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full p-8">
+            <div className="fixed inset-0 transition-opacity bg-[var(--fg-color)]/50 backdrop-blur-sm" onClick={() => setIsPdfModalOpen(false)}></div>
+            <div className="relative inline-block align-bottom bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] text-left transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full p-8">
                <h3 className="text-2xl font-bold tracking-tighter uppercase mb-2 flex items-center gap-2">
                  <Settings2 className="w-6 h-6" /> Export PDF
                </h3>
-               <p className="font-serif italic text-[11px] uppercase opacity-60 mb-6 border-b border-[#141414] pb-4">Seleziona i campi da esportare</p>
+               <p className="font-serif italic text-[11px] uppercase opacity-60 mb-6 border-b border-[var(--fg-color)] pb-4">Seleziona i campi da esportare</p>
                
                <div className="space-y-4 font-mono text-sm uppercase">
                   {Object.entries(pdfConfig).map(([key, value]) => (
                      <label key={key} className="flex items-center space-x-3 cursor-pointer group">
                         <div className="relative flex items-center justify-center">
                            <input type="checkbox" className="sr-only" checked={value} onChange={() => setPdfConfig(prev => ({ ...prev, [key]: !prev[key as keyof typeof pdfConfig] }))} />
-                           <div className={`w-5 h-5 flex items-center justify-center border transition-colors ${value ? 'bg-[#141414] border-[#141414]' : 'bg-transparent border-[#141414] group-hover:bg-[#141414]/10'}`}>
-                              {value && <div className="w-2.5 h-2.5 bg-[#E4E3E0]"></div>}
+                           <div className={`w-5 h-5 flex items-center justify-center border transition-colors ${value ? 'bg-[var(--fg-color)] border-[var(--fg-color)]' : 'bg-transparent border-[var(--fg-color)] group-hover:bg-[var(--fg-color)]/10'}`}>
+                              {value && <div className="w-2.5 h-2.5 bg-[var(--bg-color)]"></div>}
                            </div>
                         </div>
                         <span className="font-bold tracking-widest">{key === 'earTag' ? 'Orecchino' : key === 'dateOfBirth' ? 'Data Nascita' : key === 'healthStatus' ? 'Salute' : key}</span>
@@ -443,10 +443,10 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                </div>
 
                <div className="mt-8 flex gap-3">
-                  <button onClick={exportPDF} className="flex-1 w-full inline-flex justify-center border border-transparent bg-[#141414] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#E4E3E0] shadow-[2px_2px_0px_0px_#141414] hover:bg-white hover:border-[#141414] hover:text-[#141414] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all">
+                  <button onClick={exportPDF} className="flex-1 w-full inline-flex justify-center border border-transparent bg-[var(--fg-color)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--bg-color)] shadow-[2px_2px_0px_0px_var(--fg-color)] hover:bg-[var(--card-bg)] hover:border-[var(--fg-color)] hover:text-[var(--fg-color)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all">
                      Genera Report
                   </button>
-                  <button onClick={() => setIsPdfModalOpen(false)} className="w-auto inline-flex justify-center border border-[#141414] bg-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#141414] hover:bg-[#E4E3E0] transition-colors">
+                  <button onClick={() => setIsPdfModalOpen(false)} className="w-auto inline-flex justify-center border border-[var(--fg-color)] bg-[var(--card-bg)] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--fg-color)] hover:bg-[var(--bg-color)] transition-colors">
                      Chiudi
                   </button>
                </div>
@@ -459,10 +459,10 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
       {isQRScannerOpen && (
         <div className="fixed inset-0 z-[60] overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center p-4">
-            <div className="fixed inset-0 bg-[#141414]/50 backdrop-blur-sm" onClick={() => setIsQRScannerOpen(false)}></div>
-            <div className="relative bg-white border border-[#141414] shadow-[8px_8px_0px_0px_#141414] w-full max-w-sm p-4">
+            <div className="fixed inset-0 bg-[var(--fg-color)]/50 backdrop-blur-sm" onClick={() => setIsQRScannerOpen(false)}></div>
+            <div className="relative bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] w-full max-w-sm p-4">
                <h3 className="text-xl font-bold tracking-tighter uppercase mb-4">Scanner QR</h3>
-               <div className="w-full aspect-square bg-[#E4E3E0] border border-[#141414] overflow-hidden">
+               <div className="w-full aspect-square bg-[var(--bg-color)] border border-[var(--fg-color)] overflow-hidden">
                   <Scanner onScan={(result) => {
                      if (result && result.length > 0 && earTagRef.current) {
                         earTagRef.current.value = result[0].rawValue;
@@ -470,7 +470,7 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                      }
                   }} />
                </div>
-               <button type="button" onClick={() => setIsQRScannerOpen(false)} className="mt-4 w-full border border-[#141414] bg-white px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#141414] hover:bg-[#E4E3E0] transition-colors">
+               <button type="button" onClick={() => setIsQRScannerOpen(false)} className="mt-4 w-full border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--fg-color)] hover:bg-[var(--bg-color)] transition-colors">
                   Chiudi QR Scanner
                </button>
             </div>

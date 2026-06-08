@@ -45,8 +45,8 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#E4E3E0] space-y-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#141414]"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--bg-color)] space-y-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--fg-color)]"></div>
         <div className="text-xs font-mono uppercase tracking-widest opacity-50">Connessione al database in corso...</div>
       </div>
     );

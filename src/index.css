@@ -7,7 +7,25 @@
 }
 
 @layer base {
+  :root {
+    --bg-color: #E4E3E0;
+    --fg-color: #141414;
+    --card-bg: #ffffff;
+  }
+
+  .dark {
+    --bg-color: #141414;
+    --fg-color: #E4E3E0;
+    --card-bg: #1A1A1A;
+  }
+
+  /* Manual invert fallback for logo in dark mode */
+  .dark img.dark\:invert,
+  .dark img[src="/logo.png"] {
+    filter: invert(1);
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased;
+    @apply bg-[var(--bg-color)] text-[var(--fg-color)] font-sans antialiased;
   }
 }
