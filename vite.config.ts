@@ -21,28 +21,16 @@ export default defineConfig(() => {
           name: 'MOOSHion Admin',
           icons: [
             {
-              src: '/icon-192x192.png',
+              src: 'icon-192x192.png',
               type: 'image/png',
               sizes: '192x192',
-              purpose: 'any'
+              purpose: 'any maskable'
             },
             {
-              src: '/icon-192x192.png',
-              type: 'image/png',
-              sizes: '192x192',
-              purpose: 'maskable'
-            },
-            {
-              src: '/icon-512x512.png',
+              src: 'icon-512x512.png',
               type: 'image/png',
               sizes: '512x512',
-              purpose: 'any'
-            },
-            {
-              src: '/icon-512x512.png',
-              type: 'image/png',
-              sizes: '512x512',
-              purpose: 'maskable'
+              purpose: 'any maskable'
             }
           ],
           start_url: '/',
