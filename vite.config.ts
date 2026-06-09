@@ -24,15 +24,15 @@ export default defineConfig(() => {
           categories: ['productivity', 'utilities'],
           screenshots: [
             {
-              src: '/logo.png',
-              sizes: '512x512',
+              src: '/screenshot-wide.png',
+              sizes: '1280x720',
               type: 'image/png',
               form_factor: 'wide',
               label: 'MOOSHion Dashboard'
             },
             {
-              src: '/logo.png',
-              sizes: '512x512',
+              src: '/screenshot-narrow.png',
+              sizes: '720x1280',
               type: 'image/png',
               form_factor: 'narrow',
               label: 'MOOSHion Mobile'
@@ -43,13 +43,25 @@ export default defineConfig(() => {
               src: '/icon-192x192.png',
               type: 'image/png',
               sizes: '192x192',
-              purpose: 'any maskable'
+              purpose: 'any'
             },
             {
               src: '/icon-512x512.png',
               type: 'image/png',
               sizes: '512x512',
-              purpose: 'any maskable'
+              purpose: 'any'
+            },
+            {
+              src: '/icon-192x192.png',
+              type: 'image/png',
+              sizes: '192x192',
+              purpose: 'maskable'
+            },
+            {
+              src: '/icon-512x512.png',
+              type: 'image/png',
+              sizes: '512x512',
+              purpose: 'maskable'
             }
           ],
           start_url: '/',
