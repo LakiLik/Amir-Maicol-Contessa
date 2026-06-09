@@ -16,6 +16,7 @@ export default defineConfig(() => {
       VitePWA({
         registerType: 'autoUpdate',
         manifestFilename: 'manifest.json',
+        includeAssets: ['logo.png', 'icon-192x192.png', 'icon-512x512.png', 'screenshot-wide.png', 'screenshot-narrow.png'],
         manifest: {
           short_name: 'MOOSHion',
           name: 'MOOSHion Admin',
