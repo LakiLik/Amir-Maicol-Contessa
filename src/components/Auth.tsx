@@ -1,7 +1,6 @@
 import { supabase } from '../lib/supabase';
 import React, { useState } from 'react';
 import { LogIn } from 'lucide-react';
-import logoUrl from '../assets/logo.png';
 
 export default function Auth() {
   const [errorMsg, setErrorMsg] = useState('');
@@ -33,7 +32,7 @@ export default function Auth() {
       <div className="max-w-md w-full bg-[var(--card-bg)] border-2 border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] p-8 space-y-8">
         <div className="text-center">
           <div className="flex flex-col items-center justify-center mx-auto mb-4">
-            <img src={logoUrl} alt="" className="w-16 h-16 rounded-xl mb-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
+            <img src="/logo.png" alt="" className="w-16 h-16 rounded-xl mb-2 object-contain dark:invert" />
             <div className="flex flex-col items-center">
               <h1 className="text-4xl font-bold tracking-tighter uppercase leading-none text-center">MOOSH<span className="font-light opacity-60 lowercase">ion</span></h1>
               <p className="mt-0 text-[10px] font-bold font-mono uppercase tracking-widest opacity-60 text-center">Beyond the farm</p>
