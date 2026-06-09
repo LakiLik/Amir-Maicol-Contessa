@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
+    "build": "npx --yes sharp-cli -i public/logo.png -o public/icon-192x192.png resize 192 192 && npx --yes sharp-cli -i public/logo.png -o public/icon-512x512.png resize 512 512 && vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.ts dist/server.cjs",
     "lint": "tsc --noEmit"
@@ -41,6 +41,7 @@
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.25.0",
+    "sharp-cli": "^5.2.0",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
