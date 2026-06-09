@@ -20,8 +20,7 @@
   }
 
   /* Manual invert fallback for logo in dark mode */
-  .dark img.dark\:invert,
-  .dark img[src="/logo.png"] {
+  .dark img.dark\:invert {
     filter: invert(1);
   }
 

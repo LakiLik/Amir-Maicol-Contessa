@@ -3,6 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { LayoutDashboard, TableProperties, LogOut, Menu, X, Wheat, Droplet, Bell, Database, Map, Users, RefreshCw, Moon, Circle } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import logoUrl from '../assets/logo.png';
 // import { collection, query, where, onSnapshot } from '../lib/db-mock';
 // import { db } from '../lib/db-mock';
 import { CustomAlert } from '../types';
@@ -76,7 +77,7 @@ export default function Layout({ user }: LayoutProps) {
       {/* Mobile menu button */}
       <div className="md:hidden fixed top-0 w-full z-50 bg-[var(--bg-color)] border-b border-[var(--fg-color)] px-4 h-16 flex items-center justify-between">
         <div className="flex items-center">
-          <img src="/logo.png" alt="" className="w-6 h-6 rounded-md mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
+          <img src={logoUrl} alt="" className="w-6 h-6 rounded-md mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
           <div className="flex flex-col items-start mt-1">
             <span className="text-xl font-bold tracking-tighter uppercase leading-none">MOOSH<span className="font-light opacity-60 lowercase">ion</span></span>
             <span className="text-[7px] font-bold font-mono uppercase tracking-widest opacity-60 mt-[2px]">Beyond the farm</span>
@@ -163,7 +164,7 @@ export default function Layout({ user }: LayoutProps) {
         {/* Top Status Bar desktop */}
         <header className="hidden md:flex items-center justify-between px-6 py-4 border-b border-[var(--fg-color)]">
            <div className="flex items-center">
-             <img src="/logo.png" alt="" className="w-8 h-8 rounded-lg mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
+             <img src={logoUrl} alt="" className="w-8 h-8 rounded-lg mr-2 object-contain dark:invert" onError={(e) => e.currentTarget.style.display = 'none'} />
              <div className="flex flex-col items-start mt-1">
                <span className="text-xl font-bold tracking-tighter uppercase leading-none">MOOSH<span className="font-light opacity-60 lowercase">ion</span></span>
                <span className="text-[8px] font-bold font-mono uppercase tracking-widest opacity-60 mt-[2px]">Beyond the farm</span>
