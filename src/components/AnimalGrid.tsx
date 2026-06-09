@@ -85,6 +85,7 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
   // Scanner state
   const [isScanning, setIsScanning] = useState(false);
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
+  const [animalToDelete, setAnimalToDelete] = useState<string | null>(null);
   const earTagRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -433,7 +434,7 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                   <td className="px-6 py-4 whitespace-nowrap text-right text-[10px] uppercase font-bold tracking-widest gap-2 flex justify-end">
                     <Link to={`/animal/${animal.id}`} className="border border-[var(--fg-color)] text-[var(--fg-color)] bg-[var(--card-bg)] group-hover:bg-transparent group-hover:border-[var(--bg-color)] group-hover:text-[var(--bg-color)] px-3 py-1.5 transition-colors">Dettagli</Link>
                     <button onClick={() => { setEditingAnimal(animal); setUploadedPhotos(animal.photoUrls || []); setIsModalOpen(true); }} className="border border-[var(--fg-color)] text-[var(--fg-color)] bg-[var(--card-bg)] group-hover:bg-transparent group-hover:border-[var(--bg-color)] group-hover:text-[var(--bg-color)] px-3 py-1.5 transition-colors">Modifica</button>
-                    <button onClick={() => confirm('Sei sicuro?') && deleteAnimal(animal.id)} className="border border-[var(--fg-color)] text-[var(--fg-color)] bg-red-200 group-hover:bg-red-600 group-hover:text-white group-hover:border-transparent px-3 py-1.5 transition-colors">Elimina</button>
+                    <button onClick={(e) => { e.stopPropagation(); setAnimalToDelete(animal.id); }} className="border border-[var(--fg-color)] text-[var(--fg-color)] bg-red-200 group-hover:bg-red-600 group-hover:text-white group-hover:border-transparent px-3 py-1.5 transition-colors">Elimina</button>
                   </td>
                 </tr>
               ))
@@ -715,6 +716,27 @@ export default function AnimalGrid({ user }: GridProps) {  const [animals, setAn
                <button type="button" onClick={() => setIsQRScannerOpen(false)} className="mt-4 w-full border border-[var(--fg-color)] bg-[var(--card-bg)] px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--fg-color)] hover:bg-[var(--bg-color)] transition-colors">
                   Chiudi QR Scanner
                </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {animalToDelete && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-screen items-center justify-center p-4 text-center">
+            <div className="fixed inset-0 bg-[var(--fg-color)]/50 backdrop-blur-sm" onClick={() => setAnimalToDelete(null)}></div>
+            <div className="relative inline-block align-bottom bg-[var(--card-bg)] border border-[var(--fg-color)] shadow-[8px_8px_0px_0px_var(--fg-color)] text-left transform transition-all sm:my-8 sm:align-middle sm:max-w-sm w-full p-8 text-center flex flex-col items-center">
+               <h3 className="text-xl font-bold uppercase tracking-tighter mb-4 text-red-600">Elimina Animale</h3>
+               <p className="mb-6 text-sm font-mono opacity-80">Sei sicuro di voler eliminare questo animale? L'operazione è <span className="font-bold underline">irreversibile</span>.</p>
+               <div className="flex gap-4 w-full">
+                  <button onClick={() => setAnimalToDelete(null)} className="flex-1 bg-[var(--card-bg)] border border-[var(--fg-color)] px-4 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--fg-color)] hover:text-[var(--bg-color)] transition-colors active:translate-y-[2px] active:translate-x-[2px] shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none">
+                     Annulla
+                  </button>
+                  <button onClick={async () => { await deleteAnimal(animalToDelete); setAnimalToDelete(null); }} className="flex-1 bg-red-600 outline-none border border-red-600 text-white px-4 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-red-700 transition-colors active:translate-y-[2px] active:translate-x-[2px] shadow-[2px_2px_0px_0px_var(--fg-color)] active:shadow-none">
+                     Elimina
+                  </button>
+               </div>
             </div>
           </div>
         </div>
