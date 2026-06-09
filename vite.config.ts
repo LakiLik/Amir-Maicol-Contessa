@@ -19,6 +19,25 @@ export default defineConfig(() => {
         manifest: {
           short_name: 'MOOSHion',
           name: 'MOOSHion Admin',
+          id: '/',
+          description: 'Applicazione per la gestione del bestiame con sincronizzazione in tempo reale e tracciamento genealogico.',
+          categories: ['productivity', 'utilities'],
+          screenshots: [
+            {
+              src: '/logo.png',
+              sizes: '512x512',
+              type: 'image/png',
+              form_factor: 'wide',
+              label: 'MOOSHion Dashboard'
+            },
+            {
+              src: '/logo.png',
+              sizes: '512x512',
+              type: 'image/png',
+              form_factor: 'narrow',
+              label: 'MOOSHion Mobile'
+            }
+          ],
           icons: [
             {
               src: '/icon-192x192.png',
